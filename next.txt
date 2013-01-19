@@ -1,0 +1,46 @@
+# Next up
+- Skript vergleichen / Rico fragen wegen Klammerung: p0 AND p1 AND p2 = p0 AND (p1 AND p2) oder = (p0 AND p1) AND p2
+- is_formula
+- NNF
+- D-Chains
+
+- Naiver erfüllungs-algorithmus
+
+- Sufos
+- CNF
+- Klauselmengen
+- Resolution
+
+
+
+
+# Some things to overthink
+Documentation
+- UML-Diagram
+- class descriptions (task, responsibility)
+
+
+Design (decisions)
+- Functionality
+- Use Cases
+- Test driven design
+- Task Flow
+- Versioning
+
+
+GUI
+- Affordance (Buttons, Menü, List entries)
+- Substitutivity: Export/Import in multiple formats (LaTeX, XML, plain, UTF-8)
+- Aesthetics: Minimal, functional
+- Consistency: UTF-8
+
+Tests
+- Unit Tests
+- User tests
+- Performance tests
+- Profiling
+
+Patterns
+- Objects
+- Exceptions
+- 
