@@ -4,7 +4,7 @@
 - NNF
 - D-Chains
 
-- Naiver erfüllungs-algorithmus
+- Naiver erfÃ¼llungs-algorithmus
 
 - Sufos
 - CNF
@@ -29,7 +29,7 @@ Design (decisions)
 
 
 GUI
-- Affordance (Buttons, Menü, List entries)
+- Affordance (Buttons, Men, List entries)
 - Substitutivity: Export/Import in multiple formats (LaTeX, XML, plain, UTF-8)
 - Aesthetics: Minimal, functional
 - Consistency: UTF-8
