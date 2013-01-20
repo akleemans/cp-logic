@@ -29,18 +29,30 @@ class MyApplication(QtGui.QMainWindow, Ui_MainWindow):
             print f.formula
             self.listWidget.addItem(f.formula)
             
-    def menu_to_nnf(self):
-        formula = self.lineEdit.text()
-        formula = 'nnf(' + formula + ')'
-        self.lineEdit.setText(formula)
-        print 'Menu: to_nnf()'
+    def menu_loadformula(self):
+        raise NotImplementedError
+            
+    def menu_nnf(self):
+        self.lineEdit.setText('nnf(' + self.lineEdit.text() + ')')
         
     def menu_dchains(self):
-        formula = self.lineEdit.text()
-        formula = 'dchains(' + formula + ')'
-        self.lineEdit.setText(formula)
-        print 'Menu: to_dchains()'
-
+        self.lineEdit.setText('dchains(' + self.lineEdit.text() + ')')
+        
+    def menu_cnf(self):
+        self.lineEdit.setText('cnf(' + self.lineEdit.text() + ')')
+        
+    def menu_length(self):
+        self.lineEdit.setText('l(' + self.lineEdit.text() + ')')
+        
+    def menu_generate(self):
+        self.lineEdit.setText('generate(' + self.lineEdit.text() + ')')
+        
+    def menu_sat(self):
+        self.lineEdit.setText('sat(' + self.lineEdit.text() + ')')
+        
+    def menu_sufo(self):
+        self.lineEdit.setText('sufo(' + self.lineEdit.text() + ')')
+        
 if __name__ == "__main__":
     app = QtGui.QApplication(sys.argv)
     window = MyApplication()

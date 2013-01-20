@@ -71,9 +71,9 @@
    </property>
    <widget class="QMenu" name="menuDatei">
     <property name="title">
-     <string>Datei</string>
+     <string>File</string>
     </property>
-    <addaction name="actionFormel_laden"/>
+    <addaction name="actionLoad_formula"/>
    </widget>
    <widget class="QMenu" name="menu">
     <property name="title">
@@ -85,11 +85,23 @@
     <property name="title">
      <string>Tools</string>
     </property>
+    <addaction name="actionSAT_naive"/>
     <addaction name="actionD_Chains"/>
-    <addaction name="actionConvert_to_NNF"/>
-    <addaction name="actionConvert_to_CNF"/>
+   </widget>
+   <widget class="QMenu" name="menuFormula">
+    <property name="title">
+     <string>Formula</string>
+    </property>
+    <addaction name="actionLength"/>
+    <addaction name="actionSubformulas"/>
+    <addaction name="separator"/>
+    <addaction name="actionNNF"/>
+    <addaction name="actionCNF"/>
+    <addaction name="separator"/>
+    <addaction name="actionGenerate"/>
    </widget>
    <addaction name="menuDatei"/>
+   <addaction name="menuFormula"/>
    <addaction name="menuTools"/>
    <addaction name="menu"/>
   </widget>
@@ -109,14 +121,44 @@
     <string>D-Chains</string>
    </property>
   </action>
-  <action name="actionFormel_laden">
+  <action name="actionLoad_formula">
    <property name="text">
-    <string>Formel laden...</string>
+    <string>Load formula...</string>
    </property>
   </action>
   <action name="actionInfo">
    <property name="text">
     <string>Info</string>
+   </property>
+  </action>
+  <action name="actionNNF">
+   <property name="text">
+    <string>NNF</string>
+   </property>
+  </action>
+  <action name="actionCNF">
+   <property name="text">
+    <string>CNF</string>
+   </property>
+  </action>
+  <action name="actionLength">
+   <property name="text">
+    <string>Length</string>
+   </property>
+  </action>
+  <action name="actionSAT_naive">
+   <property name="text">
+    <string>SAT (naive)</string>
+   </property>
+  </action>
+  <action name="actionGenerate">
+   <property name="text">
+    <string>Generate formula</string>
+   </property>
+  </action>
+  <action name="actionSubformulas">
+   <property name="text">
+    <string>Subformulas</string>
    </property>
   </action>
  </widget>
@@ -139,14 +181,14 @@
    </hints>
   </connection>
   <connection>
-   <sender>actionConvert_to_NNF</sender>
+   <sender>actionNNF</sender>
    <signal>activated()</signal>
    <receiver>MainWindow</receiver>
-   <slot>menu_to_nnf()</slot>
+   <slot>menu_nnf()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>64</x>
-     <y>15</y>
+     <x>-1</x>
+     <y>-1</y>
     </hint>
     <hint type="destinationlabel">
      <x>209</x>
@@ -170,10 +212,112 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>actionCNF</sender>
+   <signal>activated()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>menu_cnf()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>339</x>
+     <y>249</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionLoad_formula</sender>
+   <signal>activated()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>menu_loadformula()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>339</x>
+     <y>249</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionSAT_naive</sender>
+   <signal>activated()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>menu_sat()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>339</x>
+     <y>249</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionLength</sender>
+   <signal>activated()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>menu_length()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>339</x>
+     <y>249</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionGenerate</sender>
+   <signal>activated()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>menu_generate()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>339</x>
+     <y>249</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionSubformulas</sender>
+   <signal>activated()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>menu_sufo()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>339</x>
+     <y>249</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>buttonPressed()</slot>
-  <slot>menu_to_nnf()</slot>
+  <slot>menu_nnf()</slot>
   <slot>menu_dchains()</slot>
+  <slot>menu_cnf()</slot>
+  <slot>menu_length()</slot>
+  <slot>menu_generate()</slot>
+  <slot>menu_loadformula()</slot>
+  <slot>menu_sat()</slot>
+  <slot>menu_sufo()</slot>
  </slots>
 </ui>
