@@ -14,11 +14,22 @@ class Formula(object):
     Represents a formula.
     '''
     
-    def __init__(self, formula):
+    
+    def __init__(self, formula, name='_anon'):
         '''
         Constructor
         '''
+        
+        # static
+        self.brackets = ['(', ')']
+        self.negation = [u'\u00AC']
+        self.conjunctions = [u'\u2227', u'\u2228', u'\u2192']
+        self.connectives = [u'\u2227', u'\u2228', u'\u00AC', u'\u2192', u'\u22A4', u'\u22A5']
+        self.numbers = [u'\u2080', u'\u2081', u'\u2082', u'\u2083', u'\u2084', u'\u2085', u'\u2086', u'\u2087', u'\u2088', u'\u2089']
+        
+        # formula
         self.formula = self.clean_up(formula)
+        self.name = name
         self.nnf = ''
         self.cnf = ''
     
@@ -50,23 +61,60 @@ class Formula(object):
         residue = re.sub(ur'([0-9p() \u2227\u2228\u00AC\u2192\u22A4\u22A5\u2080\u2081\u2082\u2083\u2084\u2085\u2086\u2087\u2088\u2089]+)', '', formula)
         if len(residue) != 0:
             raise FormulaInvalidError('illegal characters: '+residue)
-
+        
+        # adding spaces
+        f = ''
+        conn = self.connectives
+        for i in range(len(formula)):
+            c = formula[i]
+            f += c
+            if c in conn or c in self.numbers or c in self.brackets:
+                if i < len(formula)-1 and formula[i+1] != ' ':
+                    f += ' '
+        
         # checking for propositions
-        #raise FormulaInvalidError('')
+        parts = f.split()
+        for part in parts:
+            if part == 'p':
+                raise FormulaInvalidError('propositions need an index')
+        
+        # checking for negations
+        for i in range(len(parts)):
+            part = parts[i]
+            if part == self.negation and i < len(parts)-1 and parts[i+1] == ')':
+                        raise FormulaInvalidError('illegal negation')
 
         # checking for conjunctions
-        #raise FormulaInvalidError('')
+        for i in range(len(parts)):
+            part = parts[i]
+            if part in self.conjunctions:
+                if i < len(parts)-1:
+                    if parts[i+1] in self.conjunctions or parts[i+1] == ')':
+                        raise FormulaInvalidError('illegal conjunction')
+    
+        return f
+    
+    def to_list(self, formula):
+        return self.formula.split(' ') 
         
-        return formula
+    def length(self):
+        #self.to_nnf() 
+        parts = self.to_list(self.nnf)
+        count = []
+        conn = self.connectives
+        for part in parts:
+            if (part not in conn and part in count) or part == '(' or part == ')':
+                continue
+            count.append(part)
+        return len(count)
         
-        
-    def to_nnf(self, formula):
+    def to_nnf(self):
         # TODO implement
-        return self.nnf
+        self.nnf = ''
         
     def to_cnf(self, formula):
         # TODO implement
-        return self.cnf
+        self.cnf = ''
         
     def export_latex(self):
         # TODO implement
@@ -82,7 +130,7 @@ class Formula(object):
         formula = formula.replace(u'⊥', u'\\bot')
         
         return formula
-
+        
 ### exceptions ###
     
 class FormulaInvalidError(Exception):
