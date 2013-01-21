@@ -18,20 +18,21 @@ class MyApplication(QtGui.QMainWindow, Ui_MainWindow):
         self.setupUi(self)
         self.count = 0
         #self.listWidget.addItem(u'\u0393\u2080: p\u2080 ∧ p\u2081 ∧ (¬ p\u2082 ∨ ⊥)\n\u0393\u2081: p\u2080 ∧ p\u2081 , ¬ p\u2082 ∨ ⊥\n\u0393\u2082: ...')
-        welcome = '''Welcome to cp-logic! Try entering something like this:
-p0 AND (NOT p1 OR p2)
-A = p0 OR p1 IMPL p2 AND p0
-l(A)
----------------------------------------------
-'''
-        self.listWidget.addItem(welcome)
+        self.listWidget.addItem('Welcome to cp-logic! Try entering something like this:')
+        self.listWidget.addItem('p0 AND (NOT p1 OR p2)')
+        self.listWidget.addItem('A = p0 OR p1 IMPL p2 AND p0')
+        self.listWidget.addItem('l(A)')
+        self.listWidget.addItem('l(p0 OR p1)')
+        self.listWidget.addItem('B = (NOT p0 AND p1) AND (p0 OR p2) OR (NOT p2 AND p3)')
+        self.listWidget.addItem('sat(B)')
+        self.listWidget.addItem('----------------------------------------------------------------------------------')
         self.formulas = []
         
     def buttonPressed(self):
         entry = ''
         text = self.lineEdit.text()
         parts = text.split('(')
-        functions = ['l', 'sufo', 'nnf', 'cnf']
+        functions = ['l', 'sufo', 'nnf', 'cnf', 'sat']
         function = ''
         name = '_anon'
         
@@ -55,7 +56,7 @@ l(A)
                     name = formula
                     formula = f.formula
                     break
-            if function == '': self.listWidget.addItem(formula)
+            if function == '': entry = formula
         else:
             try:
                 f = Formula(formula, name)
@@ -79,8 +80,11 @@ l(A)
         if function != '':
             if function == 'l':
                 entry = 'l(' + name + ') = ' + str(f.length())
-            #elif function == 'sufo':
-            #    ...
+            elif function == 'sat':
+                satisfiable = f.sat()
+                if satisfiable[0]: s = 'satisfiable with ' +  ', '.join(x for x in satisfiable[1])
+                else: s = 'not satisfiable'
+                entry = 'sat(' + name + ') is ' + s
         
         self.listWidget.addItem('[' + str(self.count) + '] ' + entry)
         self.count += 1

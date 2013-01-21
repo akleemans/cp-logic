@@ -8,6 +8,9 @@ Created on 17.01.2013
 
 # http://en.wikipedia.org/wiki/List_of_logic_symbols
 import re
+import locale
+
+locale.setlocale(locale.LC_ALL, '')
 
 class Formula(object):
     '''
@@ -22,9 +25,18 @@ class Formula(object):
         
         # static
         self.brackets = ['(', ')']
-        self.negation = [u'\u00AC']
-        self.conjunctions = [u'\u2227', u'\u2228', u'\u2192']
-        self.connectives = [u'\u2227', u'\u2228', u'\u00AC', u'\u2192', u'\u22A4', u'\u22A5']
+        
+        self.NOT = u'\u00AC'
+        self.AND = u'\u2227'
+        self.OR = u'\u2228'
+        self.IMPL = u'\u2192'
+        self.conjunctions = [self.AND, self.OR, self.IMPL]
+        
+        self.TOP = u'\u22A4'
+        self.BOTTOM = u'\u22A5'
+        self.atomic_propositions = [self.TOP, self.BOTTOM]
+        self.connectives = self.conjunctions + [self.NOT] + self.atomic_propositions #[u'\u2227', u'\u2228', u'\u00AC', u'\u2192', u'\u22A4', u'\u22A5']
+
         self.numbers = [u'\u2080', u'\u2081', u'\u2082', u'\u2083', u'\u2084', u'\u2085', u'\u2086', u'\u2087', u'\u2088', u'\u2089']
         
         # formula
@@ -81,7 +93,7 @@ class Formula(object):
         # checking for negations
         for i in range(len(parts)):
             part = parts[i]
-            if part == self.negation and i < len(parts)-1 and parts[i+1] == ')':
+            if part == self.NOT and i < len(parts)-1 and parts[i+1] == ')':
                         raise FormulaInvalidError('illegal negation')
 
         # checking for conjunctions
@@ -98,7 +110,6 @@ class Formula(object):
         return self.formula.split(' ') 
         
     def length(self):
-        #self.to_nnf() 
         parts = self.to_list(self.nnf)
         count = []
         conn = self.connectives
@@ -130,6 +141,100 @@ class Formula(object):
         formula = formula.replace(u'⊥', u'\\bot')
         
         return formula
+    
+    def sat(self):
+        # 1. to NNF
+        #self.to_nnf()
+        
+        # 2. number of prop
+        parts = self.to_list(self.formula)
+        propositions = []
+        for part in parts:
+            if part not in (self.connectives + self.brackets):
+                propositions.append(part)
+        
+        propositions = list(set(propositions))
+        #print 'Propositions:', propositions
+        propositions.sort()
+        #print 'Sorted propositions:', propositions
+        
+        #print 'Found', len(propositions), 'propositions'
+        high = 2**len(propositions)
+        
+        # replace TOP and BOTTOM with t and f
+        for i in range(len(parts)):
+            if parts[i] == u'\u22A4': parts[i] = 't'
+            if parts[i] == u'\u22A5': parts[i] = 'f'
+        
+        # 3. resolve
+        subst = {'1': 't', '0': 'f'}
+        for i in range(high):
+            # deep copy
+            formula = list(parts)
+            # einschlaegiger Index
+            binary = ('{0:0' + str(len(propositions)) + 'b}').format(i)
+            
+            # replace propositions with valuation i (represented as 'binary')
+            for j in range(len(propositions)):
+                formula = [subst[binary[j]] if x == propositions[j] else x for x in formula]
+            
+            # replace negations
+            #print 'Replacing negation in', ' '.join(x for x in formula)
+            j = 0
+            while j < len(formula):
+                if formula[j] == self.NOT:
+                    if formula[j+1] == 't':
+                        formula[j+1] = 'f'
+                        del formula[j]
+                    elif formula[j+1] == 'f':
+                        formula[j+1] = 't'
+                        del formula[j]
+                    else:
+                        raise FormulaInvalidError('formula invalid/not in NNF')
+                j += 1
+            
+            if self.resolve(formula):
+                # prepare Valuation
+                truth_values = [subst[x] for x in binary]
+                valuation = []
+                for i in range(len(propositions)):
+                    valuation.append(propositions[i] + ' = ' + truth_values[i])
+                
+                return [True, valuation]
+                
+        return [False, []]
+        
+    def resolve(self, l):
+        #print 'Resolving', ' '.join(x for x in l)
+        while len(l) > 1:
+            for i in range(len(l)):
+                #print 'Step', ' '.join(x for x in l)
+                
+                # resolve AND, OR
+                if l[i] in self.conjunctions:
+                    if l[i-1] in ['t', 'f'] and l[i+1] in ['t', 'f']:
+                        new_value = ''
+                        if l[i] == self.AND:
+                            if l[i-1] == 't' and l[i+1] == 't': new_value = 't'
+                            else: new_value = 'f'
+                        elif l[i] == self.OR:
+                            if l[i-1] == 't' or l[i+1] == 't': new_value = 't'
+                            else: new_value = 'f'
+                        else:
+                            raise FormulaInvalidError('formula invalid/not in NNF')
+                        
+                        del l[i+1]
+                        l[i] = new_value
+                        del l[i-1]
+                        break # start over
+
+                # resolve brackets
+                if i > 0 and i < len(l)-1 and l[i-1] == '(' and l[i+1] == ')':
+                    del l[i+1]
+                    del l[i-1]
+                    break # start over
+                
+        return l == ['t']
         
 ### exceptions ###
     
