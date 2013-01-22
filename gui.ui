@@ -99,6 +99,7 @@
     <addaction name="actionCNF"/>
     <addaction name="separator"/>
     <addaction name="actionGenerate"/>
+    <addaction name="actionExport_to_LaTeX"/>
    </widget>
    <addaction name="menuDatei"/>
    <addaction name="menuFormula"/>
@@ -159,6 +160,11 @@
   <action name="actionSubformulas">
    <property name="text">
     <string>Subformulas</string>
+   </property>
+  </action>
+  <action name="actionExport_to_LaTeX">
+   <property name="text">
+    <string>Export to LaTeX</string>
    </property>
   </action>
  </widget>
@@ -308,6 +314,54 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>lineEdit</sender>
+   <signal>returnPressed()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>buttonPressed()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>228</x>
+     <y>457</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>343</x>
+     <y>-12</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>listWidget</sender>
+   <signal>itemDoubleClicked(QListWidgetItem*)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>entry_clicked()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>386</x>
+     <y>222</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>370</x>
+     <y>-2</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionExport_to_LaTeX</sender>
+   <signal>activated()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>menu_latex()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>339</x>
+     <y>249</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>buttonPressed()</slot>
@@ -319,5 +373,7 @@
   <slot>menu_loadformula()</slot>
   <slot>menu_sat()</slot>
   <slot>menu_sufo()</slot>
+  <slot>entry_clicked()</slot>
+  <slot>menu_latex()</slot>
  </slots>
 </ui>

@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'gui.ui'
 #
-# Created: Sun Jan 20 19:51:52 2013
+# Created: Tue Jan 22 20:30:42 2013
 #      by: pyside-uic 0.2.13 running on PySide 1.1.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -64,6 +64,8 @@ class Ui_MainWindow(object):
         self.actionGenerate.setObjectName("actionGenerate")
         self.actionSubformulas = QtGui.QAction(MainWindow)
         self.actionSubformulas.setObjectName("actionSubformulas")
+        self.actionExport_to_LaTeX = QtGui.QAction(MainWindow)
+        self.actionExport_to_LaTeX.setObjectName("actionExport_to_LaTeX")
         self.menuDatei.addAction(self.actionLoad_formula)
         self.menu.addAction(self.actionInfo)
         self.menuTools.addAction(self.actionSAT_naive)
@@ -75,6 +77,7 @@ class Ui_MainWindow(object):
         self.menuFormula.addAction(self.actionCNF)
         self.menuFormula.addSeparator()
         self.menuFormula.addAction(self.actionGenerate)
+        self.menuFormula.addAction(self.actionExport_to_LaTeX)
         self.menubar.addAction(self.menuDatei.menuAction())
         self.menubar.addAction(self.menuFormula.menuAction())
         self.menubar.addAction(self.menuTools.menuAction())
@@ -90,6 +93,9 @@ class Ui_MainWindow(object):
         QtCore.QObject.connect(self.actionLength, QtCore.SIGNAL("activated()"), MainWindow.menu_length)
         QtCore.QObject.connect(self.actionGenerate, QtCore.SIGNAL("activated()"), MainWindow.menu_generate)
         QtCore.QObject.connect(self.actionSubformulas, QtCore.SIGNAL("activated()"), MainWindow.menu_sufo)
+        QtCore.QObject.connect(self.lineEdit, QtCore.SIGNAL("returnPressed()"), MainWindow.buttonPressed)
+        QtCore.QObject.connect(self.listWidget, QtCore.SIGNAL("itemDoubleClicked(QListWidgetItem*)"), MainWindow.entry_clicked)
+        QtCore.QObject.connect(self.actionExport_to_LaTeX, QtCore.SIGNAL("activated()"), MainWindow.menu_latex)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
@@ -110,4 +116,5 @@ class Ui_MainWindow(object):
         self.actionSAT_naive.setText(QtGui.QApplication.translate("MainWindow", "SAT (naive)", None, QtGui.QApplication.UnicodeUTF8))
         self.actionGenerate.setText(QtGui.QApplication.translate("MainWindow", "Generate formula", None, QtGui.QApplication.UnicodeUTF8))
         self.actionSubformulas.setText(QtGui.QApplication.translate("MainWindow", "Subformulas", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionExport_to_LaTeX.setText(QtGui.QApplication.translate("MainWindow", "Export to LaTeX", None, QtGui.QApplication.UnicodeUTF8))
 

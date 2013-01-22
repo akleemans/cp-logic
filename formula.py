@@ -9,6 +9,7 @@ Created on 17.01.2013
 # http://en.wikipedia.org/wiki/List_of_logic_symbols
 import re
 import locale
+import time
 
 locale.setlocale(locale.LC_ALL, '')
 
@@ -48,8 +49,8 @@ class Formula(object):
     def clean_up(self, formula):
         substitutes = {u'0': u'\u2080', u'1': u'\u2081', u'2': u'\u2082', u'3': u'\u2083', u'4': u'\u2084',
                        u'5': u'\u2085', u'6': u'\u2086', u'7': u'\u2087', u'8': u'\u2088', u'9': u'\u2089',
-                       u'AND': u'\u2227', u'OR': u'\u2228', u'NOT': u'\u00AC', u'IMPL': u'\u2192',
-                       u'TOP': u'\u22A4', u'BOTTOM': u'\u22A5'}
+                       u'AND': self.AND, u'OR': self.OR, u'NOT': self.NOT, u'IMPL': self.IMPL,
+                       u'TOP': self.TOP, u'BOTTOM': self.BOTTOM}
 
         for a, b in substitutes.items():
             formula = formula.replace(a, b)
@@ -80,8 +81,11 @@ class Formula(object):
         for i in range(len(formula)):
             c = formula[i]
             f += c
-            if c in conn or c in self.numbers or c in self.brackets:
+            if c in conn or c in self.brackets:
                 if i < len(formula)-1 and formula[i+1] != ' ':
+                    f += ' '
+            if c in self.numbers:
+                if i < len(formula)-1 and formula[i+1] not in self.numbers and formula[i+1] != ' ':
                     f += ' '
         
         # checking for propositions
@@ -127,18 +131,15 @@ class Formula(object):
         # TODO implement
         self.cnf = ''
         
-    def export_latex(self):
-        # TODO implement
-        formula = formula = self.formula
-        formula = formula.replace(u'p', u'p_')
-        
-        formula = formula.replace(u'∧', u'\\wedge')
-        formula = formula.replace(u'∨', u'\\vee')
-        formula = formula.replace(u'¬', u'\\neg')
-        formula = formula.replace(u'↔', u'\\leftrightarrow')
-        formula = formula.replace(u'→', u'\\rightarrow')
-        formula = formula.replace(u'⊤', u'\\top')
-        formula = formula.replace(u'⊥', u'\\bot')
+    def latex(self):
+        formula = self.formula
+        substitutes = {u'\u2080': u'0', u'\u2081': u'1', u'\u2082': u'2', u'\u2083': u'3', u'\u2084': u'4',
+                       u'\u2085': u'5', u'\u2086': u'6', u'\u2087': u'7', u'\u2088': u'8', u'\u2089': u'9',
+                       self.AND: u'\\wedge', self.OR: u'\\vee', self.NOT: u'\\neg', self.IMPL: u'\\rightarrow',
+                       self.TOP: u'\\top', self.BOTTOM: u'\\bot', u'p': u'p_'}
+
+        for a, b in substitutes.items():
+            formula = formula.replace(a, b)
         
         return formula
     
@@ -148,38 +149,39 @@ class Formula(object):
         
         # 2. number of prop
         parts = self.to_list(self.formula)
+        #print 'Parts: ', parts
+        
         propositions = []
         for part in parts:
             if part not in (self.connectives + self.brackets):
                 propositions.append(part)
         
         propositions = list(set(propositions))
-        #print 'Propositions:', propositions
         propositions.sort()
-        #print 'Sorted propositions:', propositions
+        #print 'Propositions:', propositions
         
-        #print 'Found', len(propositions), 'propositions'
         high = 2**len(propositions)
+        print 'Found', len(propositions), 'distinct propositions =>', high, 'possibilities'
         
         # replace TOP and BOTTOM with t and f
         for i in range(len(parts)):
-            if parts[i] == u'\u22A4': parts[i] = 't'
-            if parts[i] == u'\u22A5': parts[i] = 'f'
+            if parts[i] == self.TOP: parts[i] = 't'
+            if parts[i] == self.BOTTOM: parts[i] = 'f'
         
         # 3. resolve
+        t1 = time.time()
         subst = {'1': 't', '0': 'f'}
         for i in range(high):
-            # deep copy
-            formula = list(parts)
-            # einschlaegiger Index
-            binary = ('{0:0' + str(len(propositions)) + 'b}').format(i)
+            if (time.time() - t1) > 5:
+                raise TimeOutError('calculation aborted after ' + str(round(time.time() - t1, 3)) + ' seconds')
+            formula = list(parts) # deep copy
+            binary = ('{0:0' + str(len(propositions)) + 'b}').format(i) # einschl. Index
             
             # replace propositions with valuation i (represented as 'binary')
             for j in range(len(propositions)):
                 formula = [subst[binary[j]] if x == propositions[j] else x for x in formula]
             
             # replace negations
-            #print 'Replacing negation in', ' '.join(x for x in formula)
             j = 0
             while j < len(formula):
                 if formula[j] == self.NOT:
@@ -208,8 +210,6 @@ class Formula(object):
         #print 'Resolving', ' '.join(x for x in l)
         while len(l) > 1:
             for i in range(len(l)):
-                #print 'Step', ' '.join(x for x in l)
-                
                 # resolve AND, OR
                 if l[i] in self.conjunctions:
                     if l[i-1] in ['t', 'f'] and l[i+1] in ['t', 'f']:
@@ -239,5 +239,9 @@ class Formula(object):
 ### exceptions ###
     
 class FormulaInvalidError(Exception):
+    def __init__(self, arg):
+        self.value = arg
+
+class TimeOutError(Exception):
     def __init__(self, arg):
         self.value = arg

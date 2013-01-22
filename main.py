@@ -18,75 +18,115 @@ class MyApplication(QtGui.QMainWindow, Ui_MainWindow):
         self.setupUi(self)
         self.count = 0
         #self.listWidget.addItem(u'\u0393\u2080: p\u2080 ∧ p\u2081 ∧ (¬ p\u2082 ∨ ⊥)\n\u0393\u2081: p\u2080 ∧ p\u2081 , ¬ p\u2082 ∨ ⊥\n\u0393\u2082: ...')
-        self.listWidget.addItem('Welcome to cp-logic! Try entering something like this:')
+        self.listWidget.addItem('Welcome to cp-logic! Try entering something like this (double-click on entry):')
         self.listWidget.addItem('p0 AND (NOT p1 OR p2)')
         self.listWidget.addItem('A = p0 OR p1 IMPL p2 AND p0')
         self.listWidget.addItem('l(A)')
-        self.listWidget.addItem('l(p0 OR p1)')
         self.listWidget.addItem('B = (NOT p0 AND p1) AND (p0 OR p2) OR (NOT p2 AND p3)')
         self.listWidget.addItem('sat(B)')
         self.listWidget.addItem('----------------------------------------------------------------------------------')
         self.formulas = []
         
-    def buttonPressed(self):
-        entry = ''
-        text = self.lineEdit.text()
-        parts = text.split('(')
-        functions = ['l', 'sufo', 'nnf', 'cnf', 'sat']
-        function = ''
-        name = '_anon'
+    def entry_clicked(self, b):
+        text = b.text()
+        if text.find(']') != -1:
+            text = text.split('] ')[1]
+        self.lineEdit.setText(text.replace('>', ''))
         
-        if parts[0] in functions:                       # function
-            function = parts[0]
-            formula = text[text.find('(')+1:-1]
-        else:
-            parts = self.lineEdit.text().split('=')     # assignment
-            if len(parts) == 1:
-                formula = parts[0]
-            elif len(parts) == 2:
-                name = parts[0].strip()
-                formula = parts[1].strip()
-            else:
-                entry = '[Error: Only one "=" allowed]'
-        
-        # analyze formula
+    def build_formula(self, formula, name):
+        ''' Returns formula, if existing, else builds a new one '''
         if len(formula) == 1:
             for f in self.formulas:
                 if f.name == formula:
-                    name = formula
-                    formula = f.formula
-                    break
-            if function == '': entry = formula
-        else:
+                    return f
+            raise ValueError
+        else: # build new formula
             try:
                 f = Formula(formula, name)
             except FormulaInvalidError, e:
-                entry = '[Error: ' + e.value + ']'
+                return '[Error: ' + e.value + ']'
             else:
                 formula = f.formula
-                if name != '_anon':
-                    # check if variable already exists
+                if name != '_anon': # check if variable already exists
                     for i in range(len(self.formulas)):
                         if self.formulas[i].name == name:
                             del self.formulas[i]
                     self.formulas.append(f)
-                    entry = name + ' = ' + formula
-                else:
-                    if function == '': entry = formula
+
+            return f
+    
+    def analyze_input(self, text):
+        functions = ['l', 'sufo', 'nnf', 'cnf', 'sat', 'latex']
+        anon = '_anon'
         
-        # function
-        if name == '_anon':
-            name = formula
-        if function != '':
+        if text.split('(')[0] in functions:             # function
+            function = text.split('(')[0]
+            formula = text[text.find('(')+1:-1]
+            try:
+                f = self.build_formula(formula, '_anon')
+            except ValueError, e:
+               return '[Error: meta-variable ' + formula + ' not found]'
+            
+            # length
             if function == 'l':
-                entry = 'l(' + name + ') = ' + str(f.length())
+                name = f.name
+                if name == anon: name = f.formula
+                return 'l(' + name + ') = ' + str(f.length())
+                
+            # sat
             elif function == 'sat':
-                satisfiable = f.sat()
+                try:
+                    satisfiable = f.sat()
+                except AttributeError, e:
+                    return '[Error: formula invalid]'
+                except FormulaInvalidError, e:
+                    return '[Error: ' + e.value + ']'
+                except TimeOutError, e:
+                    return '[Error: ' + e.value + ']'
+                
                 if satisfiable[0]: s = 'satisfiable with ' +  ', '.join(x for x in satisfiable[1])
                 else: s = 'not satisfiable'
-                entry = 'sat(' + name + ') is ' + s
+                name = f.name
+                if name == anon: name = f.formula
+                return 'sat(' + name + ') is ' + s
+                
+            # latex
+            if function == 'latex':
+                name = f.name
+                if name == anon: name = f.formula
+                return f.latex()
+            # ...
+                
+        elif text.find('=') != -1:                      # assignment
+            parts = text.split('=')
+            name = parts[0].strip()
+            formula = parts[1].strip()
+            f = self.build_formula(formula, name)
+            if isinstance(f, basestring): 
+                return f
+            else:
+                return name + ' = ' + f.formula
         
-        self.listWidget.addItem('[' + str(self.count) + '] ' + entry)
+        else:                                           # plain formula
+        
+            try:
+                f = self.build_formula(text, '_anon')
+            except ValueError, e:
+               return '[Error: meta-variable ' + text + ' not found]'
+                
+            if isinstance(f, basestring): 
+                return f
+            else:
+                return f.formula
+    
+    def buttonPressed(self):
+        entry = ''
+        text = self.lineEdit.text()
+        self.listWidget.addItem('>> ' + text)
+        
+        entry = self.analyze_input(text)
+
+        self.listWidget.addItem('[' + str(self.count) + ']   ' + entry)
         self.count += 1
             
     def menu_loadformula(self):
@@ -105,13 +145,16 @@ class MyApplication(QtGui.QMainWindow, Ui_MainWindow):
         self.lineEdit.setText('l(' + self.lineEdit.text() + ')')
         
     def menu_generate(self):
-        self.lineEdit.setText('generate(' + self.lineEdit.text() + ')')
+        self.lineEdit.setText('generate(10)')
         
     def menu_sat(self):
         self.lineEdit.setText('sat(' + self.lineEdit.text() + ')')
         
     def menu_sufo(self):
         self.lineEdit.setText('sufo(' + self.lineEdit.text() + ')')
+        
+    def menu_latex(self):
+        self.lineEdit.setText('latex(' + self.lineEdit.text() + ')')
         
 if __name__ == "__main__":
     app = QtGui.QApplication(sys.argv)
