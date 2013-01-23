@@ -41,12 +41,12 @@ class Formula(object):
         self.numbers = [u'\u2080', u'\u2081', u'\u2082', u'\u2083', u'\u2084', u'\u2085', u'\u2086', u'\u2087', u'\u2088', u'\u2089']
         
         # formula
-        self.formula = self.clean_up(formula)
+        self.formula = self.check(formula)
         self.name = name
         self.nnf = ''
         self.cnf = ''
     
-    def clean_up(self, formula):
+    def check(self, formula):
         substitutes = {u'0': u'\u2080', u'1': u'\u2081', u'2': u'\u2082', u'3': u'\u2083', u'4': u'\u2084',
                        u'5': u'\u2085', u'6': u'\u2086', u'7': u'\u2087', u'8': u'\u2088', u'9': u'\u2089',
                        u'AND': self.AND, u'OR': self.OR, u'NOT': self.NOT, u'IMPL': self.IMPL,
@@ -90,42 +90,57 @@ class Formula(object):
         
         # checking for propositions
         parts = f.split()
-        for part in parts:
-            if part == 'p':
+        for i in range(len(parts)):
+            if parts[i] == 'p':
                 raise FormulaInvalidError('propositions need an index')
+            if i < len(parts)-1 and parts[i].startswith('p') and parts[i+1].startswith('p'):
+                raise FormulaInvalidError('propositions need to be connected with a conjunction')
         
         # checking for negations
         for i in range(len(parts)):
             part = parts[i]
-            if part == self.NOT and i < len(parts)-1 and parts[i+1] == ')':
-                        raise FormulaInvalidError('illegal negation')
+            if part == self.NOT and i < len(parts)-1:
+                if parts[i+1] == ')' or parts[i+1] in self.conjunctions:
+                    raise FormulaInvalidError('illegal negation')
+            if part == self.NOT and i == len(parts)-1:
+                raise FormulaInvalidError('illegal negation')
 
         # checking for conjunctions
         for i in range(len(parts)):
             part = parts[i]
             if part in self.conjunctions:
-                if i < len(parts)-1:
+                if i < len(parts) - 1:
                     if parts[i+1] in self.conjunctions or parts[i+1] == ')':
                         raise FormulaInvalidError('illegal conjunction')
-    
+                if i == len(parts) - 1:
+                        raise FormulaInvalidError('illegal conjunction')
+        
+        # removing spaces
+        formula = ''.join(f)
+        self.formula = formula
+        
+        if self.length() == 0:
+            raise FormulaInvalidError('empty formula')
+        self.nnf = ''
+        
         return f
     
     def to_list(self, formula):
-        return self.formula.split(' ') 
+        return formula.split(' ') 
         
     def length(self):
-        parts = self.to_list(self.nnf)
+        parts = self.to_list(self.formula)
         count = []
         conn = self.connectives
         for part in parts:
-            if (part not in conn and part in count) or part == '(' or part == ')':
+            if (part not in conn and part in count) or part in self.brackets or part == '' or part == ' ':
                 continue
             count.append(part)
         return len(count)
         
     def to_nnf(self):
         # TODO implement
-        self.nnf = ''
+        self.nnf = self.formula
         
     def to_cnf(self, formula):
         # TODO implement
