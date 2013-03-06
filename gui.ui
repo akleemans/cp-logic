@@ -95,6 +95,7 @@
     <addaction name="actionLength"/>
     <addaction name="actionSubformulas"/>
     <addaction name="separator"/>
+    <addaction name="actionPedantic"/>
     <addaction name="actionNNF"/>
     <addaction name="actionCNF"/>
     <addaction name="separator"/>
@@ -165,6 +166,11 @@
   <action name="actionExport_to_LaTeX">
    <property name="text">
     <string>Export to LaTeX</string>
+   </property>
+  </action>
+  <action name="actionPedantic">
+   <property name="text">
+    <string>Pedantic</string>
    </property>
   </action>
  </widget>
@@ -362,6 +368,22 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>actionPedantic</sender>
+   <signal>activated()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>menu_pedantic()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>339</x>
+     <y>249</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>buttonPressed()</slot>
@@ -375,5 +397,6 @@
   <slot>menu_sufo()</slot>
   <slot>entry_clicked()</slot>
   <slot>menu_latex()</slot>
+  <slot>menu_pedantic()</slot>
  </slots>
 </ui>

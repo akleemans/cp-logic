@@ -6,7 +6,6 @@ Created on 17.01.2013
 @author: adrianus
 '''
 
-# http://en.wikipedia.org/wiki/List_of_logic_symbols
 import re
 import locale
 import time
@@ -16,15 +15,21 @@ locale.setlocale(locale.LC_ALL, '')
 class Formula(object):
     '''
     Represents a formula.
-    '''
     
+    All symbols used are canonical and http://en.wikipedia.org/wiki/List_of_logic_symbols
+    can be used as a reference.
+    '''
     
     def __init__(self, formula, name='_anon'):
         '''
         Constructor
         '''
+        # name
+        self.name = name
         
         # static
+        self.MAXIMUM_NESTING_LEVEL = 10 # TODO low for debugging; set to ~20 when productive
+        
         self.brackets = ['(', ')']
         
         self.NOT = u'\u00AC'
@@ -36,15 +41,17 @@ class Formula(object):
         self.TOP = u'\u22A4'
         self.BOTTOM = u'\u22A5'
         self.atomic_propositions = [self.TOP, self.BOTTOM]
-        self.connectives = self.conjunctions + [self.NOT] + self.atomic_propositions #[u'\u2227', u'\u2228', u'\u00AC', u'\u2192', u'\u22A4', u'\u22A5']
-
-        self.numbers = [u'\u2080', u'\u2081', u'\u2082', u'\u2083', u'\u2084', u'\u2085', u'\u2086', u'\u2087', u'\u2088', u'\u2089']
+        self.connectives = self.conjunctions + [self.NOT] + self.atomic_propositions
         
-        # formula
+        self.numbers = [u'\u2080', u'\u2081', u'\u2082', u'\u2083', u'\u2084', u'\u2085', u'\u2086', u'\u2087', 
+                        u'\u2088', u'\u2089']
+        
+        
+        # calculate variants and normal forms of formula
         self.formula = self.check(formula)
-        self.name = name
-        self.nnf = ''
-        self.cnf = ''
+        self.formula_pedantic = self.to_pedantic(self.formula)
+        self.formula_nnf = '' #self.to_nnf(self.formula_pedantic)
+        self.formula_cnf = '' #self.to_cnf(self.formula_pedantic)
     
     def check(self, formula):
         substitutes = {u'0': u'\u2080', u'1': u'\u2081', u'2': u'\u2082', u'3': u'\u2083', u'4': u'\u2084',
@@ -71,7 +78,8 @@ class Formula(object):
             raise FormulaInvalidError('too many closing brackets')
         
         # checking for illegal characters
-        residue = re.sub(ur'([0-9p() \u2227\u2228\u00AC\u2192\u22A4\u22A5\u2080\u2081\u2082\u2083\u2084\u2085\u2086\u2087\u2088\u2089]+)', '', formula)
+        residue = re.sub(ur'([0-9p() \u2227\u2228\u00AC\u2192\u22A4\u22A5\u2080\u2081\u2082\u2083\u2084\u2085\u2086'
+                       + ur'\u2087\u2088\u2089]+)', '', formula)
         if len(residue) != 0:
             raise FormulaInvalidError('illegal characters: '+residue)
         
@@ -121,9 +129,127 @@ class Formula(object):
         
         if self.length() == 0:
             raise FormulaInvalidError('empty formula')
-        self.nnf = ''
         
         return f
+    
+    def recursive_search(self, formula, index, direction):
+        print 'recursive search with', ' '.join(formula), ', idx =', index, 'dir =', direction
+        if formula.count('(') > self.MAXIMUM_NESTING_LEVEL:
+            raise MaximalNestingSizeError('maximal nesting size reached.')
+        
+        if direction == 'left':
+            d = -1
+        elif direction == 'right':
+            d = 1
+        else:
+            raise ValueError
+        
+        pos = index + d
+        
+        if formula[pos].startswith('p'):
+            return pos
+        else:
+            local_level = 0
+            while True:
+                #print 'checking', formula[pos], ', pos =', pos, ', local_level =', local_level
+                if formula[pos] == ')':
+                    local_level -= 1
+                elif formula[pos] == '(':
+                    local_level += 1
+                
+                if local_level == 0 and formula[pos][0] in ['p', '(', ')']:
+                    return pos
+                pos += d
+    
+    def to_pedantic(self, formula):
+        # TODO implement
+        # 1. AND, OR before IMPL: p0 OR p1 IMPL p2 ==> (p0 OR p1) IMPL p2
+        # 2. ANDs/ORs with brackets from left to right: p0 OR p1 OR p2 OR p3 ==> (((p0 OR p1) OR p2) OR p3)
+        # generate error if ANDs/ORs mixed on one level
+        
+        formula = self.to_list(formula)
+        max_level = 0
+        target_level = 0
+        current_level = 0
+        conj = []
+        positions = []
+        print "\nFormula:", ' '.join(formula)
+        
+        while target_level <= max_level:
+            current_level = 0
+            print '\nAktuelles Ziellevel:', target_level, ', max_level =', max_level
+            for i in range(len(formula)):
+                if formula[i] == ')' and current_level == target_level or i == len(formula) - 1: # and current_level == 1:
+                    print "im richtigen level. conj=", conj
+                    if self.AND in conj and self.OR in conj:
+                        raise FormulaInvalidError('mixed AND and OR on same level')
+                    elif sum([1 for x in conj if x == self.IMPL]) > 1:
+                        raise FormulaInvalidError('more than one implication on the same level')
+                    else:
+                        # check for implication
+                        # A = p0 OR (p1 AND NOT p2 AND p3) IMPL (p5 AND (p6 OR p7) AND p8)
+                        # A = p5 AND (p6 OR p7) AND p8
+                        
+                        pos_groups = []
+                        
+                        if self.IMPL in conj:
+                            idx = conj.index(self.IMPL)
+                            print 'Index of impl at', idx
+                            
+                            pos_groups.append(positions[:idx])
+                            pos_groups.append(positions[idx+1:])
+                        else:
+                            pos_groups.append(positions)
+                        
+                        print 'pos_groups:', pos_groups
+                        
+                        if len(pos_groups) == 1:
+                            max_brackets = 2
+                        elif len(pos_groups) == 2:
+                            max_brackets = 1
+                        
+                        for positions in pos_groups:
+                            # set brackets recursively until list has only 1 conjunction left
+                            while len(positions) >= max_brackets:
+                                print "setting brackets for positions =", positions
+                                pos = self.recursive_search(formula, positions[0], 'left')
+                                formula.insert(pos, '(')
+
+                                pos = self.recursive_search(formula, positions[0]+1, 'right')
+                                formula.insert(pos+1, ')')
+                                    
+                                #conj.pop(0)
+                                positions.pop(0)
+                                
+                                for pos in pos_groups:
+                                    for j in range(len(pos)):
+                                        pos[j] += 2
+                                i += 2
+
+                    # clean up
+                    conj = []
+                    positions = []
+                
+                if formula[i] == ')':
+                    current_level -= 1
+                if formula[i] == '(': 
+                    current_level += 1
+                    
+                max_level = max(max_level, current_level)
+                
+                # get conjunctions on current level
+                print "checking", formula[i], "current_level =", current_level, ' len(conj) =', len(conj)
+                if current_level == target_level:
+                    if formula[i] in self.conjunctions:
+                        positions.append(i)
+                        conj.append(formula[i])
+
+            # finished level
+            target_level += 1
+            conj = []
+            positions = []
+
+        return ' '.join(formula)
     
     def to_list(self, formula):
         return formula.split(' ') 
@@ -138,13 +264,38 @@ class Formula(object):
             count.append(part)
         return len(count)
         
-    def to_nnf(self):
+    def to_nnf(self, formula):
         # TODO implement
-        self.nnf = self.formula
+        
+        # 1. calculate p(A), the formula without implication
+        formula = self.to_list(formula)
+        for i in range(len(formula)):
+            if formula[i] == self.IMPL: # implication found
+                formula[i] = self.OR
+                if formula[i-1].startswith('p'):
+                    formula.insert(i-1, self.NOT)
+                elif formula[i-1] == ')':
+                    level = -1
+                    for index in range(i-2, -1, -1):
+                        if formula[index] == ')': level -= 1
+                        elif formula[index] == '(': level += 1
+                        
+                        if level == 0:
+                            formula.insert(index-1, self.NOT)
+                            break
+                        
+                else:
+                    raise FormulaInvalidError('invalid implication (no implicant found)')
+        
+        #print ' '.join(formula)
+                        
+        # 2. calculate v(A), the formula with negation only before atomic propositions
+        
+        return ' '.join(formula)
         
     def to_cnf(self, formula):
         # TODO implement
-        self.cnf = ''
+        return formula
         
     def latex(self):
         formula = self.formula
@@ -159,7 +310,7 @@ class Formula(object):
         return formula
     
     def sat(self):
-        # 1. to NNF
+        # 1. to NNF --> in initialization
         #self.to_nnf()
         
         # 2. number of prop
@@ -258,5 +409,9 @@ class FormulaInvalidError(Exception):
         self.value = arg
 
 class TimeOutError(Exception):
+    def __init__(self, arg):
+        self.value = arg
+        
+class MaximalNestingSizeError(Exception):
     def __init__(self, arg):
         self.value = arg

@@ -1,16 +1,14 @@
 # Next up
-- Skript vergleichen / Rico fragen wegen Klammerung: p0 AND p1 AND p2 = p0 AND (p1 AND p2) oder = (p0 AND p1) AND p2
-- is_formula
+- Klammerung
 - NNF
-- D-Chains
 
-- Naiver erfüllungs-algorithmus
+- D-Chains
 
 - Sufos
 - CNF
 - Klauselmengen
 - Resolution
-
+- is_formula (implizit?)
 
 
 

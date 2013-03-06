@@ -1,6 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 '''
+Main class for the cp-logic package.
+Loads the UI and the formula class.
+
 Created on 17.01.2013
 
 @author: adrianus
@@ -20,10 +23,10 @@ class MyApplication(QtGui.QMainWindow, Ui_MainWindow):
         #self.listWidget.addItem(u'\u0393\u2080: p\u2080 ∧ p\u2081 ∧ (¬ p\u2082 ∨ ⊥)\n\u0393\u2081: p\u2080 ∧ p\u2081 , ¬ p\u2082 ∨ ⊥\n\u0393\u2082: ...')
         self.listWidget.addItem('Welcome to cp-logic! Try entering something like this (double-click on entry):')
         self.listWidget.addItem('p0 AND (NOT p1 OR p2)')
-        self.listWidget.addItem('A = p0 OR p1 IMPL p2 AND p0')
-        self.listWidget.addItem('l(A)')
-        self.listWidget.addItem('B = (NOT p0 AND p1) AND (p0 OR p2) OR (NOT p2 AND p3)')
-        self.listWidget.addItem('sat(B)')
+        #self.listWidget.addItem('A = p0 OR p1 IMPL p2 AND p0')
+        #self.listWidget.addItem('l(A)')
+        #self.listWidget.addItem('B = (NOT p0 AND p1) AND (p0 OR p2) OR (NOT p2 AND p3)')
+        #self.listWidget.addItem('sat(B)')
         self.listWidget.addItem('----------------------------------------------------------------------------------')
         self.formulas = []
         
@@ -31,7 +34,7 @@ class MyApplication(QtGui.QMainWindow, Ui_MainWindow):
         text = b.text()
         if text.find(']') != -1:
             text = text.split('] ')[1]
-        self.lineEdit.setText(text.replace('>', ''))
+        self.lineEdit.setText(text.replace('>', '').strip())
         
     def build_formula(self, formula, name):
         ''' Returns formula, if existing, else builds a new one '''
@@ -56,7 +59,7 @@ class MyApplication(QtGui.QMainWindow, Ui_MainWindow):
             return f
     
     def analyze_input(self, text):
-        functions = ['l', 'sufo', 'nnf', 'cnf', 'sat', 'latex']
+        functions = ['l', 'sufo', 'nnf', 'cnf', 'sat', 'latex', 'pedantic']
         anon = '_anon'
         
         if text.split('(')[0] in functions:             # function
@@ -91,10 +94,17 @@ class MyApplication(QtGui.QMainWindow, Ui_MainWindow):
                 return 'sat(' + name + ') is ' + s
                 
             # latex
-            if function == 'latex':
+            elif function == 'latex':
                 name = f.name
                 if name == anon: name = f.formula
                 return f.latex()
+                
+            # pedantic
+            elif function == 'pedantic':
+                name = f.name
+                if name == anon: name = f.formula
+                return f.formula_pedantic
+                
             # ...
                 
         elif text.find('=') != -1:                      # assignment
@@ -125,8 +135,10 @@ class MyApplication(QtGui.QMainWindow, Ui_MainWindow):
         self.listWidget.addItem('>> ' + text)
         
         entry = self.analyze_input(text)
-
+        
         self.listWidget.addItem('[' + str(self.count) + ']   ' + entry)
+        self.listWidget.addItem('')
+        self.listWidget.scrollToBottom()
         self.count += 1
             
     def menu_loadformula(self):
@@ -155,6 +167,9 @@ class MyApplication(QtGui.QMainWindow, Ui_MainWindow):
         
     def menu_latex(self):
         self.lineEdit.setText('latex(' + self.lineEdit.text() + ')')
+    
+    def menu_pedantic(self):
+        self.lineEdit.setText('pedantic(' + self.lineEdit.text() + ')')
         
 if __name__ == "__main__":
     app = QtGui.QApplication(sys.argv)
