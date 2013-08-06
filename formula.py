@@ -280,16 +280,45 @@ class Formula(object):
                         elif formula[index] == '(': level += 1
                         
                         if level == 0:
-                            formula.insert(index-1, self.NOT)
+                            formula.insert(index, self.NOT)
                             break
-                        
+                            
                 else:
                     raise FormulaInvalidError('invalid implication (no implicant found)')
         
-        #print ' '.join(formula)
-                        
         # 2. calculate v(A), the formula with negation only before atomic propositions
+        #formula = self.to_list(formula)
+
+        max_length = len(formula)
+        i = 0
+        while i < max_length:
+            #print 'i =', i, 'formula = ', formula
+            if formula[i] == self.NOT:
+                if formula[i+1] == self.NOT:    # double negation found
+                    formula.pop(i)
+                    formula.pop(i)
+                    i -= 1
+                    max_length -= 2
+                elif formula[i+1] == '(':      # 'bad' negation found
+                    formula.pop(i)
+                    formula.insert(i+1, self.NOT)
+                    
+                    level = 0
+                    for index in range(i+2, len(formula)):
+                        if formula[index] == ')': level -= 1
+                        elif formula[index] == '(': level += 1
+                        
+                        if level == 0 and (formula[index] in self.conjunctions):
+                            if formula[index] == self.OR: formula[index] = self.AND
+                            elif formula[index] == self.AND: formula[index] = self.OR
+                            formula.insert(index+1, self.NOT)
+                            break
+            i += 1
         
+        if formula[0] == '(' and formula[-1] == ')':
+            formula.pop(0)
+            formula.pop(-1)
+
         return ' '.join(formula)
         
     def to_cnf(self, formula):

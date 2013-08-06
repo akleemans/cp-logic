@@ -219,18 +219,47 @@ class FormulaTest(unittest.TestCase):
     def test_nnf3(self):
         string = 'p0 AND p1 IMPL p2'
         formula = Formula(string)
-        self.failUnless(formula.formula_nnf == u'( p₀ ∧ p₁ ) ∨ ¬ p₂')
+        self.failUnless(formula.formula_nnf == u'( ¬ p₀ ∨ ¬ p₁ ) ∨ p₂')
         
     def test_nnf4(self):
         string = 'p0 AND (p1 OR p2) IMPL p2'
         formula = Formula(string)
-        self.failUnless(formula.formula_nnf == u'( p₀ ∧ ( p₁ ∨ p₂ ) ) ∨ ¬ p₂')
+        self.failUnless(formula.formula_nnf == u'( ¬ p₀ ∨ ( ¬ p₁ ∧ ¬ p₂ ) ) ∨ p₂')
         
     def test_nnf5(self):
         string = 'p0 IMPL NOT (p0 AND p1)'
         formula = Formula(string)
-        self.failUnless(formula.formula_nnf == u'')
+        self.failUnless(formula.formula_nnf == u'¬ p₀ ∨ ( ¬ p₀ ∨ ¬ p₁ )')
         
+    def test_nnf6(self):
+        string = 'NOT (p0 AND p1)'
+        formula = Formula(string)
+        self.failUnless(formula.formula_nnf == u'¬ p₀ ∨ ¬ p₁')
+        
+    def test_nnf7(self):
+        string = 'NOT ((p0 AND p1) OR (p2 OR p3))'
+        formula = Formula(string)
+        self.failUnless(formula.formula_nnf == u'( ¬ p₀ ∨ ¬ p₁ ) ∧ ( ¬ p₂ ∧ ¬ p₃ )')
+        
+    def test_nnf8(self):
+        string = 'NOT NOT p0'
+        formula = Formula(string)
+        self.failUnless(formula.formula_nnf == u'p₀')
+        
+    def test_nnf9(self):
+        string = 'NOT NOT NOT (p0 AND NOT p1)'
+        formula = Formula(string)
+        self.failUnless(formula.formula_nnf == u'¬ p₀ ∨ p₁')
+        
+    def test_nnf10(self):
+        string = 'NOT ((p0 AND p1) OR (p2 OR p3))'
+        formula = Formula(string)
+        self.failUnless(formula.formula_nnf == u'( ¬ p₀ ∨ ¬ p₁ ) ∧ ( ¬ p₂ ∧ ¬ p₃ )')
+        
+    def test_nnf11(self):
+        string = 'NOT (p0 AND NOT (p1 AND NOT (NOT p2 OR NOT p3)))'
+        formula = Formula(string)
+        self.failUnless(formula.formula_nnf == u'¬ p₀ ∨ ( p₁ ∧ ( p₂ ∧ p₃ ) )')
         
 if __name__ == "__main__":
     unittest.main()
