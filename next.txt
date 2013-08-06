@@ -1,5 +1,5 @@
 # Next up
-- Klammerung
+- Klammerung -> pedantic
 - NNF
 
 - D-Chains
@@ -8,9 +8,27 @@
 - CNF
 - Klauselmengen
 - Resolution
+
 - is_formula (implizit?)
 
+# Funktionsübersicht
+## done
+- length
+- sat
+- latex
 
+## dran
+- pedantic
+
+## 2do
+- nnf
+- sufos
+- cnf
+
+## vague idea
+- draw_pedantic: Binärer Baum der Formel zeichnen
+- resolve
+- clauses
 
 # Some things to overthink
 Documentation

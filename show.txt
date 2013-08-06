@@ -1,0 +1,2 @@
+p0 OR (p1 AND p2 AND (NOT p2 IMPL p1)) -> pedantic
+

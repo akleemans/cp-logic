@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 '''
-Created on 23.01.2012
+Tests for the formula class.
 
 @author: adrianus
 '''
@@ -92,6 +92,12 @@ class FormulaTest(unittest.TestCase):
         except FormulaInvalidError: pass
         else: self.fail("() is an empty formula and not valid.")
         
+    def test_invalidFormula_empty3(self):
+        string = '(())'
+        try: f = Formula(string)
+        except FormulaInvalidError: pass
+        else: self.fail("() is an empty formula and not valid.")
+        
     def test_validFormula1(self):
         string = 'p0 IMPL p1'
         formula = Formula(string)
@@ -107,6 +113,8 @@ class FormulaTest(unittest.TestCase):
         formula = Formula(string, 'formula1')
         self.failUnless(formula.name == 'formula1')
         
+    ### length()
+    
     def test_formula_length1(self):
         string = 'p0'
         formula = Formula(string)
@@ -127,15 +135,102 @@ class FormulaTest(unittest.TestCase):
         formula = Formula(string)
         self.failUnless(formula.length() == 6)
         
-#    def test_pedantic(self):
-#        string = 'p0 OR p1 IMPL p1 AND p2'
-#        formula = Formula(string)
-#        self.failUnless(formula.formula != formula.formula_pedantic)
-
-#    def test_nnf1(self):
-#        string = 'p0 IMPL p1'
-#        formula = Formula(string)
-#        self.failUnless(formula.length() == 4)
+    def test_formula_length5(self):
+        string = 'p0 OR p1 OR p2 OR p3 OR p4 OR p5'
+        formula = Formula(string)
+        self.failUnless(formula.length() == 11)
+        
+    def test_formula_length6(self):
+        string = 'p0 OR p0 OR p0 OR p0 OR p0'
+        formula = Formula(string)
+        self.failUnless(formula.length() == 5)
+    
+    ### pedantic()
+    
+    def test_pedantic1(self):
+        string = 'p0 OR p1 IMPL p1 AND p2'
+        formula = Formula(string)
+        self.failUnless(formula.formula_pedantic == u'( p₀ ∨ p₁ ) → ( p₁ ∧ p₂ )')
+        
+    def test_pedantic2(self):
+        string = 'p0 AND p1 AND p2'
+        formula = Formula(string)
+        self.failUnless(formula.formula_pedantic == u'( p₀ ∧ p₁ ) ∧ p₂')
+        
+    def test_pedantic3(self):
+        string = 'p0 AND p1 AND p2 AND p3'
+        formula = Formula(string)
+        self.failUnless(formula.formula_pedantic == u'( ( p₀ ∧ p₁ ) ∧ p₂ ) ∧ p₃')
+        
+    def test_pedantic4(self):
+        string = 'p0 OR p1 OR p2 OR p3 OR p4 OR p5'
+        formula = Formula(string)
+        self.failUnless(formula.formula_pedantic == u'( ( ( ( p₀ ∨ p₁ ) ∨ p₂ ) ∨ p₃ ) ∨ p₄ ) ∨ p₅')
+        
+    def test_pedantic5(self):
+        string = 'p0 OR p1 OR p2 OR p3 OR p4 OR p5 OR p6 OR p7 OR p8 OR p9 OR p10'
+        formula = Formula(string)
+        self.failUnless(formula.formula_pedantic == u'( ( ( ( ( ( ( ( ( p₀ ∨ p₁ ) ∨ p₂ ) ∨ p₃ ) ∨ p₄ ) ∨ p₅ ) ∨ p₆ ) ∨ p₇ ) ∨ p₈ ) ∨ p₉ ) ∨ p₁₀')
+    
+    def test_pedantic6(self):
+        string = 'p0 OR p1 OR (p2 AND p3 IMPL p1)'
+        formula = Formula(string)
+        self.failUnless(formula.formula_pedantic == u'( p₀ ∨ p₁ ) ∨ ( ( p₂ ∧ p₃ ) → p₁ )')
+        
+    def test_pedantic7(self):
+        string = 'p0 AND p1 IMPL p2 AND p3 IMPL p4'
+        try: f = Formula(string)
+        except FormulaInvalidError: pass
+        else: self.fail('More than one implication not allowed.')
+        
+    def test_pedantic8(self):
+        string = 'p0 AND p1 OR p2'
+        try: f = Formula(string)
+        except FormulaInvalidError: pass
+        else: self.fail('Mixed ANDs and ORs are not allowed.')
+        
+    def test_pedantic9(self):
+        string = 'p0 OR p1 OR (p2 AND p3) OR p4'
+        formula = Formula(string)
+        self.failUnless(formula.formula_pedantic == u'( ( p₀ ∨ p₁ ) ∨ ( p₂ ∧ p₃ ) ) ∨ p₄')
+        
+    def test_pedantic10(self):
+        string = 'p0 OR NOT p1 OR NOT p2 IMPL p0 AND p1 AND p2'
+        formula = Formula(string)
+        self.failUnless(formula.formula_pedantic == u'( ( p₀ ∨ ¬ p₁ ) ∨ ¬ p₂ ) → ( ( p₀ ∧ p₁ ) ∧ p₂ )')
+        
+    def test_pedantic11(self):
+        string = 'p0 OR (p1 AND p2 AND p3) IMPL (p5 AND (p6 OR p7) AND p8)'
+        formula = Formula(string)
+        self.failUnless(formula.formula_pedantic == u'( p₀ ∨ ( ( p₁ ∧ p₂ ) ∧ p₃ ) ) → ( ( p₅ ∧ ( p₆ ∨ p₇ ) ) ∧ p₈ )')
+    
+    ### nnf()
+    
+    def test_nnf1(self):
+        string = 'p0'
+        formula = Formula(string)
+        self.failUnless(formula.formula_nnf == u'p₀')
+        
+    def test_nnf2(self):
+        string = 'p0 IMPL p1'
+        formula = Formula(string)
+        self.failUnless(formula.formula_nnf == u'¬ p₀ ∨ p₁')
+        
+    def test_nnf3(self):
+        string = 'p0 AND p1 IMPL p2'
+        formula = Formula(string)
+        self.failUnless(formula.formula_nnf == u'( p₀ ∧ p₁ ) ∨ ¬ p₂')
+        
+    def test_nnf4(self):
+        string = 'p0 AND (p1 OR p2) IMPL p2'
+        formula = Formula(string)
+        self.failUnless(formula.formula_nnf == u'( p₀ ∧ ( p₁ ∨ p₂ ) ) ∨ ¬ p₂')
+        
+    def test_nnf5(self):
+        string = 'p0 IMPL NOT (p0 AND p1)'
+        formula = Formula(string)
+        self.failUnless(formula.formula_nnf == u'')
+        
         
 if __name__ == "__main__":
     unittest.main()

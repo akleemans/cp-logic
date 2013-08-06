@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 '''
-Created on 17.01.2013
+Represents a formula and its exceptions.
 
 @author: adrianus
 '''
@@ -50,7 +50,7 @@ class Formula(object):
         # calculate variants and normal forms of formula
         self.formula = self.check(formula)
         self.formula_pedantic = self.to_pedantic(self.formula)
-        self.formula_nnf = '' #self.to_nnf(self.formula_pedantic)
+        self.formula_nnf = self.to_nnf(self.formula_pedantic)
         self.formula_cnf = '' #self.to_cnf(self.formula_pedantic)
     
     def check(self, formula):
@@ -162,7 +162,7 @@ class Formula(object):
                 pos += d
     
     def to_pedantic(self, formula):
-        # TODO implement
+        # Description:
         # 1. AND, OR before IMPL: p0 OR p1 IMPL p2 ==> (p0 OR p1) IMPL p2
         # 2. ANDs/ORs with brackets from left to right: p0 OR p1 OR p2 OR p3 ==> (((p0 OR p1) OR p2) OR p3)
         # generate error if ANDs/ORs mixed on one level
@@ -177,25 +177,24 @@ class Formula(object):
         
         while target_level <= max_level:
             current_level = 0
-            print '\nAktuelles Ziellevel:', target_level, ', max_level =', max_level
+            print '\nActual goal level:', target_level, ', max_level =', max_level
             for i in range(len(formula)):
                 if formula[i] == ')' and current_level == target_level or i == len(formula) - 1: # and current_level == 1:
-                    print "im richtigen level. conj=", conj
-                    if self.AND in conj and self.OR in conj:
+                    print "in the correct level. conj = ", conj
+                    
+                    # check for invalid formulas.
+                    a = self.AND + self.OR
+                    b = self.OR + self.AND
+                    conj_str = ''.join(conj)
+                    if self.AND in conj and self.OR in conj and (a in conj_str or b in conj_str):
                         raise FormulaInvalidError('mixed AND and OR on same level')
                     elif sum([1 for x in conj if x == self.IMPL]) > 1:
                         raise FormulaInvalidError('more than one implication on the same level')
                     else:
-                        # check for implication
-                        # A = p0 OR (p1 AND NOT p2 AND p3) IMPL (p5 AND (p6 OR p7) AND p8)
-                        # A = p5 AND (p6 OR p7) AND p8
-                        
                         pos_groups = []
                         
                         if self.IMPL in conj:
-                            idx = conj.index(self.IMPL)
-                            print 'Index of impl at', idx
-                            
+                            idx = conj.index(self.IMPL) #print 'Index of impl at', idx
                             pos_groups.append(positions[:idx])
                             pos_groups.append(positions[idx+1:])
                         else:

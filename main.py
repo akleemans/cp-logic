@@ -4,8 +4,6 @@
 Main class for the cp-logic package.
 Loads the UI and the formula class.
 
-Created on 17.01.2013
-
 @author: adrianus
 '''
 
@@ -104,6 +102,12 @@ class MyApplication(QtGui.QMainWindow, Ui_MainWindow):
                 name = f.name
                 if name == anon: name = f.formula
                 return f.formula_pedantic
+            
+            # nnf
+            elif function == 'nnf':
+                name = f.name
+                if name == anon: name = f.formula
+                return f.formula_nnf
                 
             # ...
                 
