@@ -1,29 +1,19 @@
-# Next up
-- Klammerung -> pedantic
-- NNF
+# Funktionsübersicht
+## done
+- l
+- sat
+- latex
+- pedantic
+- nnf
+- sufo
 
+## 2do
+
+- cnf
 - D-Chains
-
-- Sufos
 - CNF
 - Klauselmengen
 - Resolution
-
-- is_formula (implizit?)
-
-# Funktionsübersicht
-## done
-- length
-- sat
-- latex
-
-## dran
-- pedantic
-
-## 2do
-- nnf
-- sufos
-- cnf
 
 ## vague idea
 - draw_pedantic: Binärer Baum der Formel zeichnen

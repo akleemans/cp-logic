@@ -133,7 +133,8 @@ class Formula(object):
         return f
     
     def recursive_search(self, formula, index, direction):
-        print 'recursive search with', ' '.join(formula), ', idx =', index, 'dir =', direction
+        # returns the position of the part which lies on the same level in the formula.
+        #print 'recursive search with', ' '.join(formula), ', idx =', index, 'dir =', direction
         if formula.count('(') > self.MAXIMUM_NESTING_LEVEL:
             raise MaximalNestingSizeError('maximal nesting size reached.')
         
@@ -158,7 +159,10 @@ class Formula(object):
                     local_level += 1
                 
                 if local_level == 0 and formula[pos][0] in ['p', '(', ')']:
-                    return pos
+                    if pos+d >= 0 and pos+d < len(formula) and formula[pos+d] == self.NOT:
+                        return pos+d
+                    else:
+                        return pos
                 pos += d
     
     def to_pedantic(self, formula):
@@ -173,14 +177,14 @@ class Formula(object):
         current_level = 0
         conj = []
         positions = []
-        print "\nFormula:", ' '.join(formula)
+        #print "\nFormula:", ' '.join(formula)
         
         while target_level <= max_level:
             current_level = 0
-            print '\nActual goal level:', target_level, ', max_level =', max_level
+            #print '\nActual goal level:', target_level, ', max_level =', max_level
             for i in range(len(formula)):
                 if formula[i] == ')' and current_level == target_level or i == len(formula) - 1: # and current_level == 1:
-                    print "in the correct level. conj = ", conj
+                   # print "in the correct level. conj = ", conj
                     
                     # check for invalid formulas.
                     a = self.AND + self.OR
@@ -200,7 +204,7 @@ class Formula(object):
                         else:
                             pos_groups.append(positions)
                         
-                        print 'pos_groups:', pos_groups
+                        #print 'pos_groups:', pos_groups
                         
                         if len(pos_groups) == 1:
                             max_brackets = 2
@@ -210,7 +214,7 @@ class Formula(object):
                         for positions in pos_groups:
                             # set brackets recursively until list has only 1 conjunction left
                             while len(positions) >= max_brackets:
-                                print "setting brackets for positions =", positions
+                                #print "setting brackets for positions =", positions
                                 pos = self.recursive_search(formula, positions[0], 'left')
                                 formula.insert(pos, '(')
 
@@ -237,7 +241,7 @@ class Formula(object):
                 max_level = max(max_level, current_level)
                 
                 # get conjunctions on current level
-                print "checking", formula[i], "current_level =", current_level, ' len(conj) =', len(conj)
+                #print "checking", formula[i], "current_level =", current_level, ' len(conj) =', len(conj)
                 if current_level == target_level:
                     if formula[i] in self.conjunctions:
                         positions.append(i)
@@ -251,7 +255,58 @@ class Formula(object):
         return ' '.join(formula)
     
     def to_list(self, formula):
-        return formula.split(' ') 
+        formula = formula.split(' ')
+        formula2 = []
+        for i in range(len(formula)):
+            if formula[i] in self.numbers:
+                formula2[-1] = formula2[-1] + formula[i].strip()
+            else:
+                formula2.append(formula[i].strip())
+        
+        #print 'Splitted formula: ', ' '.join(formula2)
+        return formula2
+        
+    def sufo(self):
+        # add formula itself to start with
+        #print 'Formula:', self.formula_pedantic
+        subformulas = [self.formula_pedantic]
+        
+        element_count = 0
+        while element_count < len(subformulas):
+            # walk through newly added elements
+            for i in range(element_count, len(subformulas)):
+                element = self.to_list(subformulas[i])
+                element_count += 1
+                for j in range(len(element)):
+                    # conjunction rule: add both parts to the subformula set
+                    if element[j] in self.conjunctions:
+                        # left part
+                        idx = self.recursive_search(element, j, 'left')
+                        #print 'At connective', element[j], 'at pos', j, ', found end pos:', idx
+                        new_element = ' '.join(element[idx:j])
+                        #if element[idx-1] == self.NOT: new_element = self.NOT + new_element
+                        
+                        #print 'checking left part...:', new_element
+                        if new_element not in subformulas:
+                            subformulas.append(new_element)
+                            #print 'Added left part:', new_element
+                        # right part
+                        idx = self.recursive_search(element, j, 'right')
+                        new_element = ' '.join(element[j+1:idx+1])
+                        if new_element not in subformulas:
+                            subformulas.append(new_element)
+                            #print 'Added right part:', new_element
+                    
+                    # NOT rule: add the part after the negation to the sufo-set
+                    elif element[j] == self.NOT:
+                        idx = self.recursive_search(element, j, 'right')
+                        new_element = ' '.join(element[j+1:idx+1])
+                        if new_element not in subformulas:
+                            subformulas.append(new_element)
+                            #print 'Added', new_element
+        
+        subformulas.sort(key = len)
+        return '\n'.join(subformulas) # return list of strings
         
     def length(self):
         parts = self.to_list(self.formula)
@@ -315,9 +370,10 @@ class Formula(object):
                             break
             i += 1
         
-        if formula[0] == '(' and formula[-1] == ')':
-            formula.pop(0)
-            formula.pop(-1)
+        # broken
+        #if formula[0] == '(' and formula[-1] == ')':
+        #    formula.pop(0)
+        #    formula.pop(-1)
 
         return ' '.join(formula)
         

@@ -234,12 +234,12 @@ class FormulaTest(unittest.TestCase):
     def test_nnf6(self):
         string = 'NOT (p0 AND p1)'
         formula = Formula(string)
-        self.failUnless(formula.formula_nnf == u'¬ p₀ ∨ ¬ p₁')
+        self.failUnless(formula.formula_nnf == u'( ¬ p₀ ∨ ¬ p₁ )')
         
     def test_nnf7(self):
         string = 'NOT ((p0 AND p1) OR (p2 OR p3))'
         formula = Formula(string)
-        self.failUnless(formula.formula_nnf == u'( ¬ p₀ ∨ ¬ p₁ ) ∧ ( ¬ p₂ ∧ ¬ p₃ )')
+        self.failUnless(formula.formula_nnf == u'( ( ¬ p₀ ∨ ¬ p₁ ) ∧ ( ¬ p₂ ∧ ¬ p₃ ) )')
         
     def test_nnf8(self):
         string = 'NOT NOT p0'
@@ -249,17 +249,39 @@ class FormulaTest(unittest.TestCase):
     def test_nnf9(self):
         string = 'NOT NOT NOT (p0 AND NOT p1)'
         formula = Formula(string)
-        self.failUnless(formula.formula_nnf == u'¬ p₀ ∨ p₁')
+        self.failUnless(formula.formula_nnf == u'( ¬ p₀ ∨ p₁ )')
         
     def test_nnf10(self):
         string = 'NOT ((p0 AND p1) OR (p2 OR p3))'
         formula = Formula(string)
-        self.failUnless(formula.formula_nnf == u'( ¬ p₀ ∨ ¬ p₁ ) ∧ ( ¬ p₂ ∧ ¬ p₃ )')
+        self.failUnless(formula.formula_nnf == u'( ( ¬ p₀ ∨ ¬ p₁ ) ∧ ( ¬ p₂ ∧ ¬ p₃ ) )')
         
     def test_nnf11(self):
         string = 'NOT (p0 AND NOT (p1 AND NOT (NOT p2 OR NOT p3)))'
         formula = Formula(string)
-        self.failUnless(formula.formula_nnf == u'¬ p₀ ∨ ( p₁ ∧ ( p₂ ∧ p₃ ) )')
+        self.failUnless(formula.formula_nnf == u'( ¬ p₀ ∨ ( p₁ ∧ ( p₂ ∧ p₃ ) ) )')
         
+    ### sufo()
+    
+    def test_sufo1(self):
+        string = 'p0'
+        formula = Formula(string)
+        self.failUnless(formula.sufo() == u'p₀')
+        
+    def test_sufo2(self):
+        string = 'p0 AND p1'
+        formula = Formula(string)
+        self.failUnless(formula.sufo() == u'p₀\np₁\np₀ ∧ p₁')
+        
+    def test_sufo3(self):
+        string = 'NOT p0 IMPL p1'
+        formula = Formula(string)
+        self.failUnless(formula.sufo() == u'p₀\np₁\n¬ p₀ → p₁')
+        
+    def test_sufo4(self):
+        string = 'NOT ((p0 AND p1) OR (p2 OR p3))'
+        formula = Formula(string)
+        self.failUnless(formula.sufo() == u'p₀\np₁\np₂\np₃\n( p₀ ∧ p₁ )\n( p₂ ∨ p₃ )\n( ( p₀ ∧ p₁ ) ∨ ( p₂ ∨ p₃ ) )\n¬ ( ( p₀ ∧ p₁ ) ∨ ( p₂ ∨ p₃ ) )')
+
 if __name__ == "__main__":
     unittest.main()

@@ -89,7 +89,8 @@ class MyApplication(QtGui.QMainWindow, Ui_MainWindow):
                 else: s = 'not satisfiable'
                 name = f.name
                 if name == anon: name = f.formula
-                return 'sat(' + name + ') is ' + s
+                #return 'sat(' + name + ') is ' + s
+                return '...is ' + s
                 
             # latex
             elif function == 'latex':
@@ -109,6 +110,11 @@ class MyApplication(QtGui.QMainWindow, Ui_MainWindow):
                 if name == anon: name = f.formula
                 return f.formula_nnf
                 
+            # sufo
+            elif function == 'sufo':
+                name = f.name
+                if name == anon: name = f.formula
+                return 'Found the following subformulas:\n' + f.sufo()
             # ...
                 
         elif text.find('=') != -1:                      # assignment
