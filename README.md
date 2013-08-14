@@ -5,21 +5,23 @@ Some tools for classical propositional logic - my bachelor thesis.
 
 ## Examples
 
-    is_formula("a ->)
+    nnf(p0 AND p1 IMPL p2)
+    sat(p0 AND NOT (p0 AND p1))
 
 ## Documentation
 
 ### Formula-Class
-* `set()`: Sets the formula
-* `get()`: Gets the formula
-* `is_formula()`: Test if a given String is a formula in CP
-* `to_nnf()`: Return Formula as NNF
-* `to_cnf()`: Return Formula as CNF
+* `l()`: Returns the length of a given formula
+* `sufo()`: Returns all subformulas from a given formula
+* `latex()`: Returns a latex representation of a given formula
+* `pedantic()`: Returns a pedantic (binary) representation of a given formula
+* `nnf()`: Returns a formula in negation normal form
+* `cnf()`: Returns a formula in conjunctive normal form
 
 ### Tools-Class
-* `d_chains()`: Use D-chains to prove formula
+* `sat()`: Returns, if possible, a valid valuation for the given formula
+* `dchains()`: Use D-chains to prove formula
 * `resolution()`: Apply resolution
-* `sat_psc()`
 
 ### UML
 

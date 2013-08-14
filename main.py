@@ -57,7 +57,7 @@ class MyApplication(QtGui.QMainWindow, Ui_MainWindow):
             return f
     
     def analyze_input(self, text):
-        functions = ['l', 'sufo', 'nnf', 'cnf', 'sat', 'latex', 'pedantic']
+        functions = ['l', 'sufo', 'nnf', 'cnf', 'sat', 'latex', 'pedantic', 'dchains']
         anon = '_anon'
         
         if text.split('(')[0] in functions:             # function
@@ -116,6 +116,13 @@ class MyApplication(QtGui.QMainWindow, Ui_MainWindow):
                 if name == anon: name = f.formula
                 subformulas = f.sufo()
                 return 'Found the following ' + str(len(subformulas)) +' subformulas:\n' + '\n'.join(subformulas)
+                
+            # dchains
+            elif function == 'dchains':
+                name = f.name
+                if name == anon: name = f.formula
+                return f.formula_nnf
+                
             # ...
                 
         elif text.find('=') != -1:                      # assignment

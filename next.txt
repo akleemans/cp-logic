@@ -8,23 +8,17 @@
 - sufo
 
 ## 2do
+- BOTTOM, TOP einbinden? ==> NNF anpassen!, NOT TOP --> BOTTOM ?
+- verschachtelte funktionen? Input-handling refactoren
+- Hilfe, Anwendungsbeispiele zu Funktionen (Type help ___ for help to a function)?
 
-- cnf
-- D-Chains
-- CNF
-- Klauselmengen
-- Resolution
-
-## vague idea
-- draw_pedantic: Binärer Baum der Formel zeichnen
-- resolve
-- clauses
+- Formula-Klasse: cnf(), draw()
+- Tools-Klasse: sat(), dchains(), clauseset(), resolve()
 
 # Some things to overthink
 Documentation
 - UML-Diagram
 - class descriptions (task, responsibility)
-
 
 Design (decisions)
 - Functionality
