@@ -147,23 +147,19 @@ class Formula(object):
         
         pos = index + d
         
-        if formula[pos].startswith('p'):
-            return pos
-        else:
-            local_level = 0
-            while True:
-                #print 'checking', formula[pos], ', pos =', pos, ', local_level =', local_level
-                if formula[pos] == ')':
-                    local_level -= 1
-                elif formula[pos] == '(':
-                    local_level += 1
+        local_level = 0
+        while True:
+            if formula[pos] == ')':
+                local_level -= 1
+            elif formula[pos] == '(':
+                local_level += 1
                 
-                if local_level == 0 and formula[pos][0] in ['p', '(', ')']:
-                    if pos+d >= 0 and pos+d < len(formula) and formula[pos+d] == self.NOT:
-                        return pos+d
-                    else:
-                        return pos
-                pos += d
+            if local_level == 0 and formula[pos][0] in ['p', '(', ')']:
+                if direction == 'left' and formula[pos-1] == self.NOT:
+                    return pos-1
+                else:
+                    return pos
+            pos += d
     
     def to_pedantic(self, formula):
         # Description:
@@ -285,14 +281,15 @@ class Formula(object):
                         #print 'At connective', element[j], 'at pos', j, ', found end pos:', idx
                         new_element = ' '.join(element[idx:j])
                         #if element[idx-1] == self.NOT: new_element = self.NOT + new_element
-                        
                         #print 'checking left part...:', new_element
                         if new_element not in subformulas:
                             subformulas.append(new_element)
                             #print 'Added left part:', new_element
+                            
                         # right part
                         idx = self.recursive_search(element, j, 'right')
                         new_element = ' '.join(element[j+1:idx+1])
+                        #print 'checking right part...:', new_element
                         if new_element not in subformulas:
                             subformulas.append(new_element)
                             #print 'Added right part:', new_element
@@ -306,7 +303,8 @@ class Formula(object):
                             #print 'Added', new_element
         
         subformulas.sort(key = len)
-        return '\n'.join(subformulas) # return list of strings
+        #return '\n'.join(subformulas) # return list of strings
+        return subformulas
         
     def length(self):
         parts = self.to_list(self.formula)

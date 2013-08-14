@@ -266,22 +266,33 @@ class FormulaTest(unittest.TestCase):
     def test_sufo1(self):
         string = 'p0'
         formula = Formula(string)
-        self.failUnless(formula.sufo() == u'p₀')
+        self.failUnless(formula.sufo() == [u'p₀'])
         
     def test_sufo2(self):
         string = 'p0 AND p1'
         formula = Formula(string)
-        self.failUnless(formula.sufo() == u'p₀\np₁\np₀ ∧ p₁')
+        self.failUnless(formula.sufo() == [u'p₀', u'p₁', u'p₀ ∧ p₁'])
         
     def test_sufo3(self):
         string = 'NOT p0 IMPL p1'
         formula = Formula(string)
-        self.failUnless(formula.sufo() == u'p₀\np₁\n¬ p₀ → p₁')
+        self.failUnless(formula.sufo() == [u'p₀', u'p₁', u'¬ p₀', u'¬ p₀ → p₁'])
         
     def test_sufo4(self):
         string = 'NOT ((p0 AND p1) OR (p2 OR p3))'
         formula = Formula(string)
-        self.failUnless(formula.sufo() == u'p₀\np₁\np₂\np₃\n( p₀ ∧ p₁ )\n( p₂ ∨ p₃ )\n( ( p₀ ∧ p₁ ) ∨ ( p₂ ∨ p₃ ) )\n¬ ( ( p₀ ∧ p₁ ) ∨ ( p₂ ∨ p₃ ) )')
+        self.failUnless(formula.sufo() == [u'p₀', u'p₁', u'p₂', u'p₃', u'( p₀ ∧ p₁ )', u'( p₂ ∨ p₃ )', u'( ( p₀ ∧ p₁ ) ∨ ( p₂ ∨ p₃ ) )', u'¬ ( ( p₀ ∧ p₁ ) ∨ ( p₂ ∨ p₃ ) )'])
+
+    def test_sufo5(self):
+        string = 'p0 AND (NOT p1 OR p2)'
+        formula = Formula(string)
+        self.failUnless(formula.sufo() == [u'p₀', u'p₁', u'p₂', u'¬ p₁', u'( ¬ p₁ ∨ p₂ )', u'p₀ ∧ ( ¬ p₁ ∨ p₂ )'])
+
+    def test_sufo6(self):
+        string = 'p0 AND NOT (p1 AND NOT (p2 AND NOT p3))'
+        formula = Formula(string)
+        self.failUnless(formula.sufo() == [u'p₀', u'p₁', u'p₂', u'p₃', u'¬ p₃', u'( p₂ ∧ ¬ p₃ )', u'¬ ( p₂ ∧ ¬ p₃ )', u'( p₁ ∧ ¬ ( p₂ ∧ ¬ p₃ ) )', u'¬ ( p₁ ∧ ¬ ( p₂ ∧ ¬ p₃ ) )', u'p₀ ∧ ¬ ( p₁ ∧ ¬ ( p₂ ∧ ¬ p₃ ) )'])
+
 
 if __name__ == "__main__":
     unittest.main()

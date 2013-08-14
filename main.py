@@ -114,7 +114,8 @@ class MyApplication(QtGui.QMainWindow, Ui_MainWindow):
             elif function == 'sufo':
                 name = f.name
                 if name == anon: name = f.formula
-                return 'Found the following subformulas:\n' + f.sufo()
+                subformulas = f.sufo()
+                return 'Found the following ' + str(len(subformulas)) +' subformulas:\n' + '\n'.join(subformulas)
             # ...
                 
         elif text.find('=') != -1:                      # assignment
