@@ -307,6 +307,7 @@ class Formula(object):
         return subformulas
         
     def length(self):
+        # TODO: count occurences of atomic propositions
         parts = self.to_list(self.formula)
         count = []
         conn = self.connectives
