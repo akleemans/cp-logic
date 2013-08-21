@@ -251,6 +251,8 @@ class Formula(object):
         return ' '.join(formula)
     
     def to_list(self, formula):
+        # Splits a formula to a list of symbols
+        
         formula = formula.split(' ')
         formula2 = []
         for i in range(len(formula)):
@@ -259,12 +261,11 @@ class Formula(object):
             else:
                 formula2.append(formula[i].strip())
         
-        #print 'Splitted formula: ', ' '.join(formula2)
         return formula2
         
     def sufo(self):
-        # add formula itself to start with
-        #print 'Formula:', self.formula_pedantic
+        # Returns all subformulas to a given formula.
+        
         subformulas = [self.formula_pedantic]
         
         element_count = 0
@@ -274,51 +275,40 @@ class Formula(object):
                 element = self.to_list(subformulas[i])
                 element_count += 1
                 for j in range(len(element)):
-                    # conjunction rule: add both parts to the subformula set
-                    if element[j] in self.conjunctions:
-                        # left part
-                        idx = self.recursive_search(element, j, 'left')
-                        #print 'At connective', element[j], 'at pos', j, ', found end pos:', idx
-                        new_element = ' '.join(element[idx:j])
-                        #if element[idx-1] == self.NOT: new_element = self.NOT + new_element
-                        #print 'checking left part...:', new_element
-                        if new_element not in subformulas:
-                            subformulas.append(new_element)
-                            #print 'Added left part:', new_element
-                            
-                        # right part
-                        idx = self.recursive_search(element, j, 'right')
-                        new_element = ' '.join(element[j+1:idx+1])
-                        #print 'checking right part...:', new_element
-                        if new_element not in subformulas:
-                            subformulas.append(new_element)
-                            #print 'Added right part:', new_element
                     
-                    # NOT rule: add the part after the negation to the sufo-set
+                    # 1. conjunction rule: add both parts to the subformula set
+                    if element[j] in self.conjunctions:
+                        idx = self.recursive_search(element, j, 'left') # left part
+                        new_element = ' '.join(element[idx:j])
+                        if new_element not in subformulas: subformulas.append(new_element)
+                            
+                        idx = self.recursive_search(element, j, 'right') # right part
+                        new_element = ' '.join(element[j+1:idx+1])
+                        if new_element not in subformulas: subformulas.append(new_element)
+                    
+                    # 2. NOT rule: add the part after the negation to the sufo-set
                     elif element[j] == self.NOT:
                         idx = self.recursive_search(element, j, 'right')
                         new_element = ' '.join(element[j+1:idx+1])
-                        if new_element not in subformulas:
-                            subformulas.append(new_element)
-                            #print 'Added', new_element
+                        if new_element not in subformulas: subformulas.append(new_element)
         
         subformulas.sort(key = len)
-        #return '\n'.join(subformulas) # return list of strings
         return subformulas
         
     def length(self):
-        # TODO: count occurences of atomic propositions
+        # Returns the length of a given formula
         parts = self.to_list(self.formula)
         count = []
         conn = self.connectives
         for part in parts:
-            if (part not in conn and part in count) or part in self.brackets or part == '' or part == ' ':
-                continue
-            count.append(part)
+            if part not in self.brackets and part != '' and part != ' ':
+                count.append(part)
         return len(count)
         
     def to_nnf(self, formula):
-        # TODO implement
+        # Calculates the negation normal form of a given formula.
+        # This is done by first calculating p(A) by removing the implications
+        # and then calculating v(A), where negations only stand before atomic propositions.
         
         # 1. calculate p(A), the formula without implication
         formula = self.to_list(formula)
@@ -341,12 +331,9 @@ class Formula(object):
                     raise FormulaInvalidError('invalid implication (no implicant found)')
         
         # 2. calculate v(A), the formula with negation only before atomic propositions
-        #formula = self.to_list(formula)
-
         max_length = len(formula)
         i = 0
         while i < max_length:
-            #print 'i =', i, 'formula = ', formula
             if formula[i] == self.NOT:
                 if formula[i+1] == self.NOT:    # double negation found
                     formula.pop(i)
@@ -368,11 +355,6 @@ class Formula(object):
                             formula.insert(index+1, self.NOT)
                             break
             i += 1
-        
-        # broken
-        #if formula[0] == '(' and formula[-1] == ')':
-        #    formula.pop(0)
-        #    formula.pop(-1)
 
         return ' '.join(formula)
         
@@ -393,12 +375,10 @@ class Formula(object):
         return formula
     
     def sat(self):
-        # 1. to NNF --> in initialization
-        #self.to_nnf()
-        
-        # 2. number of prop
+        # Returns if a given formula is satisfiable by brute forcing through all possibilities.
+        # Will return the first valuation (if existing) which satisfies the formula.
+
         parts = self.to_list(self.formula)
-        #print 'Parts: ', parts
         
         propositions = []
         for part in parts:
@@ -407,7 +387,6 @@ class Formula(object):
         
         propositions = list(set(propositions))
         propositions.sort()
-        #print 'Propositions:', propositions
         
         high = 2**len(propositions)
         print 'Found', len(propositions), 'distinct propositions =>', high, 'possibilities'
@@ -456,7 +435,9 @@ class Formula(object):
         return [False, []]
         
     def resolve(self, l):
-        #print 'Resolving', ' '.join(x for x in l)
+        # Resolves a formula with no propositions to a single value (true or false).
+        # Used by sat().
+        
         while len(l) > 1:
             for i in range(len(l)):
                 # resolve AND, OR
