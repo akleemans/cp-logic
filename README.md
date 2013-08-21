@@ -18,7 +18,7 @@ If you're using multiple versions of Python, you may specify the version by ente
     python2.7 main.py
 
 You should then see a window open like this (depending on your operating system):
-![](https://raw.github.com/captainfox/cp-logic/master/toolbox.png)
+[[toolbox.png]]
 
 You can now enter one of the examples or test
 
