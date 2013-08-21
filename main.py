@@ -174,9 +174,6 @@ class MyApplication(QtGui.QMainWindow, Ui_MainWindow):
     def menu_length(self):
         self.lineEdit.setText('l(' + self.lineEdit.text() + ')')
         
-    def menu_generate(self):
-        self.lineEdit.setText('generate(10)')
-        
     def menu_sat(self):
         self.lineEdit.setText('sat(' + self.lineEdit.text() + ')')
         

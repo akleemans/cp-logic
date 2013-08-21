@@ -54,6 +54,8 @@ class Formula(object):
         self.formula_cnf = '' #self.to_cnf(self.formula_pedantic)
     
     def check(self, formula):
+        ''' Checks if a formula is valid. '''
+        
         substitutes = {u'0': u'\u2080', u'1': u'\u2081', u'2': u'\u2082', u'3': u'\u2083', u'4': u'\u2084',
                        u'5': u'\u2085', u'6': u'\u2086', u'7': u'\u2087', u'8': u'\u2088', u'9': u'\u2089',
                        u'AND': self.AND, u'OR': self.OR, u'NOT': self.NOT, u'IMPL': self.IMPL,
@@ -133,8 +135,8 @@ class Formula(object):
         return f
     
     def recursive_search(self, formula, index, direction):
-        # returns the position of the part which lies on the same level in the formula.
-        #print 'recursive search with', ' '.join(formula), ', idx =', index, 'dir =', direction
+        ''' Returns the position of the part which lies on the same level in the formula. '''
+
         if formula.count('(') > self.MAXIMUM_NESTING_LEVEL:
             raise MaximalNestingSizeError('maximal nesting size reached.')
         
@@ -162,10 +164,19 @@ class Formula(object):
             pos += d
     
     def to_pedantic(self, formula):
-        # Description:
-        # 1. AND, OR before IMPL: p0 OR p1 IMPL p2 ==> (p0 OR p1) IMPL p2
-        # 2. ANDs/ORs with brackets from left to right: p0 OR p1 OR p2 OR p3 ==> (((p0 OR p1) OR p2) OR p3)
-        # generate error if ANDs/ORs mixed on one level
+        ''' 
+        Returns the correct/pedantic form of the formula. 
+        The important rules here are (chapter 2.1):
+        
+            1. Negation takes precedence over AND, OR, and IMPL
+                p0 AND NOT p1       ==> p0 AND (NOT p1)
+                
+            2. AND, OR take precedence over IMPL
+                p0 AND p1 IMPL p2   ==> (p0 AND p1) IMPL p2
+                
+            3. AND, OR are interpreted from left to the right
+                p0 AND p1 AND p2    ==> (p0 AND p1) AND p2
+        '''
         
         formula = self.to_list(formula)
         max_level = 0
@@ -173,11 +184,9 @@ class Formula(object):
         current_level = 0
         conj = []
         positions = []
-        #print "\nFormula:", ' '.join(formula)
         
         while target_level <= max_level:
             current_level = 0
-            #print '\nActual goal level:', target_level, ', max_level =', max_level
             for i in range(len(formula)):
                 if formula[i] == ')' and current_level == target_level or i == len(formula) - 1: # and current_level == 1:
                    # print "in the correct level. conj = ", conj
@@ -237,7 +246,6 @@ class Formula(object):
                 max_level = max(max_level, current_level)
                 
                 # get conjunctions on current level
-                #print "checking", formula[i], "current_level =", current_level, ' len(conj) =', len(conj)
                 if current_level == target_level:
                     if formula[i] in self.conjunctions:
                         positions.append(i)
@@ -251,8 +259,7 @@ class Formula(object):
         return ' '.join(formula)
     
     def to_list(self, formula):
-        # Splits a formula to a list of symbols
-        
+        ''' Splits a formula to a list of symbols. '''
         formula = formula.split(' ')
         formula2 = []
         for i in range(len(formula)):
@@ -264,8 +271,7 @@ class Formula(object):
         return formula2
         
     def sufo(self):
-        # Returns all subformulas to a given formula.
-        
+        ''' Returns all subformulas to a given formula. '''
         subformulas = [self.formula_pedantic]
         
         element_count = 0
@@ -296,7 +302,7 @@ class Formula(object):
         return subformulas
         
     def length(self):
-        # Returns the length of a given formula
+        ''' Returns the length of a given formula. '''
         parts = self.to_list(self.formula)
         count = []
         conn = self.connectives
@@ -306,9 +312,11 @@ class Formula(object):
         return len(count)
         
     def to_nnf(self, formula):
-        # Calculates the negation normal form of a given formula.
-        # This is done by first calculating p(A) by removing the implications
-        # and then calculating v(A), where negations only stand before atomic propositions.
+        '''
+        Calculates the negation normal form of a given formula.
+        This is done by first calculating p(A) by removing the implications
+        and then calculating v(A), where negations only stand before atomic propositions.
+        '''
         
         # 1. calculate p(A), the formula without implication
         formula = self.to_list(formula)
@@ -359,10 +367,12 @@ class Formula(object):
         return ' '.join(formula)
         
     def to_cnf(self, formula):
+        ''' Calculates the conjunctive negation form of a given formula. '''
         # TODO implement
         return formula
         
     def latex(self):
+        ''' Returns the formula in LaTeX-syntax. '''
         formula = self.formula
         substitutes = {u'\u2080': u'0', u'\u2081': u'1', u'\u2082': u'2', u'\u2083': u'3', u'\u2084': u'4',
                        u'\u2085': u'5', u'\u2086': u'6', u'\u2087': u'7', u'\u2088': u'8', u'\u2089': u'9',
@@ -375,8 +385,10 @@ class Formula(object):
         return formula
     
     def sat(self):
-        # Returns if a given formula is satisfiable by brute forcing through all possibilities.
-        # Will return the first valuation (if existing) which satisfies the formula.
+        '''
+        Returns if a given formula is satisfiable by brute forcing through all possibilities.
+        Will return the first valuation (if existing) which satisfies the formula.
+        '''
 
         parts = self.to_list(self.formula)
         
@@ -435,8 +447,10 @@ class Formula(object):
         return [False, []]
         
     def resolve(self, l):
-        # Resolves a formula with no propositions to a single value (true or false).
-        # Used by sat().
+        '''
+        Resolves a formula with no propositions to a single value (true or false).
+        Used by sat().
+        '''
         
         while len(l) > 1:
             for i in range(len(l)):
