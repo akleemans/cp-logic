@@ -99,7 +99,6 @@
     <addaction name="actionNNF"/>
     <addaction name="actionCNF"/>
     <addaction name="separator"/>
-    <addaction name="actionGenerate"/>
     <addaction name="actionExport_to_LaTeX"/>
    </widget>
    <addaction name="menuDatei"/>
@@ -277,22 +276,6 @@
    <signal>activated()</signal>
    <receiver>MainWindow</receiver>
    <slot>menu_length()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>339</x>
-     <y>249</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>actionGenerate</sender>
-   <signal>activated()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>menu_generate()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>-1</x>

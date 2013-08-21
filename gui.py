@@ -2,8 +2,8 @@
 
 # Form implementation generated from reading ui file 'gui.ui'
 #
-# Created: Wed Feb 20 23:25:52 2013
-#      by: pyside-uic 0.2.13 running on PySide 1.1.1
+# Created: Wed Aug 21 15:18:48 2013
+#      by: pyside-uic 0.2.14 running on PySide 1.1.2
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -79,7 +79,6 @@ class Ui_MainWindow(object):
         self.menuFormula.addAction(self.actionNNF)
         self.menuFormula.addAction(self.actionCNF)
         self.menuFormula.addSeparator()
-        self.menuFormula.addAction(self.actionGenerate)
         self.menuFormula.addAction(self.actionExport_to_LaTeX)
         self.menubar.addAction(self.menuDatei.menuAction())
         self.menubar.addAction(self.menuFormula.menuAction())
@@ -94,7 +93,6 @@ class Ui_MainWindow(object):
         QtCore.QObject.connect(self.actionLoad_formula, QtCore.SIGNAL("activated()"), MainWindow.menu_loadformula)
         QtCore.QObject.connect(self.actionSAT_naive, QtCore.SIGNAL("activated()"), MainWindow.menu_sat)
         QtCore.QObject.connect(self.actionLength, QtCore.SIGNAL("activated()"), MainWindow.menu_length)
-        QtCore.QObject.connect(self.actionGenerate, QtCore.SIGNAL("activated()"), MainWindow.menu_generate)
         QtCore.QObject.connect(self.actionSubformulas, QtCore.SIGNAL("activated()"), MainWindow.menu_sufo)
         QtCore.QObject.connect(self.lineEdit, QtCore.SIGNAL("returnPressed()"), MainWindow.buttonPressed)
         QtCore.QObject.connect(self.listWidget, QtCore.SIGNAL("itemDoubleClicked(QListWidgetItem*)"), MainWindow.entry_clicked)

@@ -390,7 +390,7 @@ class Formula(object):
         Will return the first valuation (if existing) which satisfies the formula.
         '''
 
-        parts = self.to_list(self.formula)
+        parts = self.to_list(self.formula_nnf)
         
         propositions = []
         for part in parts:
