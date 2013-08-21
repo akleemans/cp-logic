@@ -28,7 +28,7 @@ class Formula(object):
         self.name = name
         
         # static
-        self.MAXIMUM_NESTING_LEVEL = 10 # TODO low for debugging; set to ~20 when productive
+        self.MAXIMUM_NESTING_LEVEL = 20 # TODO low for debugging; set to ~20 when productive
         
         self.brackets = ['(', ')']
         

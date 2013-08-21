@@ -33,7 +33,15 @@ class MyApplication(QtGui.QMainWindow, Ui_MainWindow):
         if text.find(']') != -1:
             text = text.split('] ')[1]
         self.lineEdit.setText(text.replace('>', '').strip())
-        
+    
+    def get_formula(self, name):
+        ''' Returns formula, if existing. '''
+        #print 'Existing formulas:', self.formulas
+        for f in self.formulas:
+            if f.name == name:
+                return f
+        raise ValueError
+            
     def build_formula(self, formula, name):
         ''' Returns formula, if existing, else builds a new one '''
         if len(formula) == 1:
@@ -57,14 +65,102 @@ class MyApplication(QtGui.QMainWindow, Ui_MainWindow):
             return f
     
     def analyze_input(self, text):
-        functions = ['l', 'sufo', 'nnf', 'cnf', 'sat', 'latex', 'pedantic', 'dchains']
+        ''' 
+        Analyzes the string which the user typed into the text field.
+        Right now, there are the following two cases:
+        
+            1. Definition of a meta variable, for example
+                A = p0 AND NOT p1
+            
+            2. Applying some sort of function on a formula or metavariable, for example
+                sat(A)
+                l(A)
+                
+            Functions can be nested to the first degree:
+                l(nnf(A))
+                sufo(cnf(A))
+                latex(pedantic(A))
+                
+            Flexible assignment:
+                C = A AND NOT B
+                D = nnf(NOT C)
+                E = cnf(A) AND NOT nnf(NOT B AND p0)
+                
+        '''
+        print '0. Starting with:', text
+        # 1. Check if the statement is an assignment
+        assignment_flag = ''
+        if text.find('=') != -1:                      # assignment
+            if len(text.split('=')[0].strip()) == 1:
+                assignment_flag = text.split('=')[0].strip()
+                text = text.split('=')[1].strip()
+            else:
+                raise ValueError
+        
+        print '1. After assignment check:', text
+        # 2. Substitute meta variables with existing formulas
+        capitals = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+        text = ' ' + text + ' '
+        delimiters = [' ', '(', ')']
+        
+        text_new = ''
+        for i in range(1, len(text)-1):
+            if text[i] in capitals and text[i-1] in delimiters and text[i+1] in delimiters:
+                try:
+                    text_new += '(' + self.get_formula(text[i]).formula + ')'
+                except ValueError, e:
+                    return '[Error: meta-variable ' + text[i] + ' not found]'
+            else:
+                text_new += text[i]
+        text = text_new
+        print '2. Substituted meta variables. Now got:', text
+        
+        # 3. Resolve form-functions (NNF, CNF, pedantic)
+        forms = ['nnf', 'cnf', 'pedantic']
         anon = '_anon'
         
+        for form in forms:
+            while text.find(form) != -1:
+                pos = text.find(form) + len(form) + 1
+                pos2 = pos - 1
+                level = 1
+                while level > 0:
+                    pos2 += 1
+                    if text[pos2] == ')':
+                        level -= 1
+                    elif text[pos2] == '(':
+                        level += 1
+                    
+                f = self.build_formula(text[pos:pos2], anon)
+                
+                print 'In resolving forms. text[pos:pos2] =', text[pos:pos2]
+                print 'f =', f
+                
+                if form == 'nnf': formula = f.formula_nnf
+                elif form == 'cnf': formula = f.formula_cnf
+                elif form == 'pedantic': formula = f.formula_pedantic
+                
+                text_new = text[:pos - len(form) - 1] + formula + text[pos2+1:]
+                text = text_new
+
+        print '3. Resolved form-functions. Now got:', text
+
+        # 4. a) If assignment, assign formula to meta-variable
+        if assignment_flag != '':                      # assignment
+            f = self.build_formula(text, assignment_flag)
+            if isinstance(f, basestring): 
+                return f
+            else:
+                return assignment_flag + ' = ' + f.formula
+        
+        # 4. b) If function, execute it and show result
+        functions = ['l', 'sufo', 'sat', 'latex', 'dchains']
+
         if text.split('(')[0] in functions:             # function
             function = text.split('(')[0]
             formula = text[text.find('(')+1:-1]
             try:
-                f = self.build_formula(formula, '_anon')
+                f = self.build_formula(formula, anon)
             except ValueError, e:
                return '[Error: meta-variable ' + formula + ' not found]'
             
@@ -99,16 +195,16 @@ class MyApplication(QtGui.QMainWindow, Ui_MainWindow):
                 return f.latex()
                 
             # pedantic
-            elif function == 'pedantic':
-                name = f.name
-                if name == anon: name = f.formula
-                return f.formula_pedantic
+            #elif function == 'pedantic':
+            #    name = f.name
+            #    if name == anon: name = f.formula
+            #    return f.formula_pedantic
             
             # nnf
-            elif function == 'nnf':
-                name = f.name
-                if name == anon: name = f.formula
-                return f.formula_nnf
+            #elif function == 'nnf':
+            #    name = f.name
+            #    if name == anon: name = f.formula
+            #    return f.formula_nnf
                 
             # sufo
             elif function == 'sufo':
@@ -124,24 +220,9 @@ class MyApplication(QtGui.QMainWindow, Ui_MainWindow):
                 return f.formula_nnf
                 
             # ...
-                
-        elif text.find('=') != -1:                      # assignment
-            parts = text.split('=')
-            name = parts[0].strip()
-            formula = parts[1].strip()
-            f = self.build_formula(formula, name)
-            if isinstance(f, basestring): 
-                return f
-            else:
-                return name + ' = ' + f.formula
-        
+                    
         else:                                           # plain formula
-        
-            try:
-                f = self.build_formula(text, '_anon')
-            except ValueError, e:
-               return '[Error: meta-variable ' + text + ' not found]'
-                
+            f = self.build_formula(text, anon)
             if isinstance(f, basestring): 
                 return f
             else:
