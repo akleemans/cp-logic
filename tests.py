@@ -133,7 +133,7 @@ class FormulaTest(unittest.TestCase):
     def test_formula_length4(self):
         string = 'p0 OR p1 IMPL p2 AND p0'
         formula = Formula(string)
-        self.failUnless(formula.length() == 6)
+        self.failUnless(formula.length() == 7)
         
     def test_formula_length5(self):
         string = 'p0 OR p1 OR p2 OR p3 OR p4 OR p5'
@@ -143,7 +143,7 @@ class FormulaTest(unittest.TestCase):
     def test_formula_length6(self):
         string = 'p0 OR p0 OR p0 OR p0 OR p0'
         formula = Formula(string)
-        self.failUnless(formula.length() == 5)
+        self.failUnless(formula.length() == 9)
     
     ### pedantic()
     
@@ -293,6 +293,47 @@ class FormulaTest(unittest.TestCase):
         formula = Formula(string)
         self.failUnless(formula.sufo() == [u'p₀', u'p₁', u'p₂', u'p₃', u'¬ p₃', u'( p₂ ∧ ¬ p₃ )', u'¬ ( p₂ ∧ ¬ p₃ )', u'( p₁ ∧ ¬ ( p₂ ∧ ¬ p₃ ) )', u'¬ ( p₁ ∧ ¬ ( p₂ ∧ ¬ p₃ ) )', u'p₀ ∧ ¬ ( p₁ ∧ ¬ ( p₂ ∧ ¬ p₃ ) )'])
 
+    ### cnf()
+    
+    def test_cnf1(self):
+        string = 'p0'
+        formula = Formula(string)
+        self.failUnless(formula.formula_cnf == u'p₀')
+
+    def test_cnf2(self):
+        string = 'TOP'
+        formula = Formula(string)
+        self.failUnless(formula.formula_cnf == u'(p₀ ∨ ¬ p₀)')
+
+    def test_cnf3(self):
+        string = 'TOP AND p0'
+        formula = Formula(string)
+        self.failUnless(formula.formula_cnf == u'(p₀ ∨ ¬ p₀) ∧ p₀')
+
+    def test_cnf4(self):
+        string = 'TOP OR BOTTOM'
+        formula = Formula(string)
+        self.failUnless(formula.formula_cnf == u'(p₀ ∨ ¬ p₀) ∨ (p₀ ∧ ¬ p₀)')
+
+    def test_cnf5(self):
+        string = 'NOT TOP'
+        formula = Formula(string)
+        self.failUnless(formula.equals(formula.formula_cnf, u'¬ (p₀ ∨ ¬ p₀)'))
+
+    def test_cnf6(self):
+        string = 'p0 OR (p1 AND p2)'
+        formula = Formula(string)
+        self.failUnless(formula.equals(formula.formula_cnf, u'(p₀ ∨ p₁) ∧ (p₀ ∨ p₂)'))
+
+    def test_cnf7(self):
+        string = '(p0 AND p1) OR (p2 AND p3)'
+        formula = Formula(string)
+        self.failUnless(formula.equals(formula.formula_cnf, u'((p₀ ∨ p₂) ∧ (p₁ ∨ p₂)) ∧ ((p₀ ∨ p₃) ∧ (p₁ ∨ p₃))'))
+
+    def test_cnf8(self):
+        string = '(p0 AND p1) AND (p2 AND (p3 OR (p4 AND p5)))'
+        formula = Formula(string)
+        self.failUnless(formula.equals(formula.formula_cnf, u'(p₀ ∧ p₁) ∧ (p₂ ∧ ((p₃ ∨ p₄) ∧ (p₃ ∨ p₅)))'))
 
 if __name__ == "__main__":
     unittest.main()

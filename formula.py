@@ -588,6 +588,9 @@ class Formula(object):
                 
         return l == ['t']
         
+    def equals(self, f1, f2):
+	return f1.replace(' ', '') == f2.replace(' ', '')
+
 ### exceptions ###
     
 class FormulaInvalidError(Exception):
