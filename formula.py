@@ -51,7 +51,7 @@ class Formula(object):
         self.formula = self.check(formula)
         self.formula_pedantic = self.to_pedantic(self.formula)
         self.formula_nnf = self.to_nnf(self.formula_pedantic)
-        self.formula_cnf = '' #self.to_cnf(self.formula_pedantic)
+        self.formula_cnf = self.to_cnf(self.formula_pedantic)
     
     def check(self, formula):
         ''' Checks if a formula is valid. '''
@@ -367,10 +367,118 @@ class Formula(object):
         return ' '.join(formula)
         
     def to_cnf(self, formula):
-        ''' Calculates the conjunctive negation form of a given formula. '''
-        # TODO implement
-        return formula
+        ''' 
+        Calculates the conjunctive negation form of a given formula.
+        As of definition 154 of the script, we apply the (sigma) and (tau)-transformation
+        to obtain cnf(A) of a given formula A.
+
+        First, TOP and BOTTOM are replaced:
+        TOP ==> (p0 OR NOT p0)
+        BOTTOM ==> (p0 AND NOT p0)
+
+        Then, the following formulas are substituted:
+        A OR (B1 AND B2) ==> (A OR B1) AND (A OR B2)
+        (A1 AND A2) OR B ==> (A1 OR B) AND (A2 OR B)
+
+        (A1 AND A2) OR (B1 AND B2) ==> ((A1 AND A2) OR B1) AND ((A1 AND A2) OR B2) (first step)
+        '''
         
+        # 1. replace TOP, BOTTOM
+        formula = self.to_list(formula)
+        subst = {self.TOP: u'(p\u2080 ' + self.OR + ' ' + self.NOT + u' p\u2080)', 
+                 self.BOTTOM: u'(p\u2080 ' + self.AND + ' ' + self.NOT + u' p\u2080)'}
+
+        for i in range(len(formula)):
+            if formula[i] in [self.TOP, self.BOTTOM]:
+                formula[i] = subst[formula[i]]
+
+        # recompile formula
+        temp = ' '.join(formula)
+        formula = self.to_list(temp)
+
+        # 2. replace subformulas
+        # get level depth
+        max_level = ' '.join(formula).count('(')
+        print 'Nesting depth:', max_level
+
+        # replace subformulas from top level to bottom
+        current_level = 0
+        level = -1
+        restart_level = False
+        while level <= max_level: # loop over levels
+            level += 1
+            current_level = 0
+            print 'Checking level =', level
+
+            for i in range(len(formula)): # loop over formula
+                # if already changed formula, start again on same level
+                if restart_level:
+                    restart_level = False
+                    level = max(level-2, -1)
+                    break
+
+                if formula[i] == '(': current_level += 1
+                if formula[i] == ')': current_level -= 1
+                
+                #print 'formula[i] =', formula[i], ', level =', level, ', current_level =', current_level
+
+                if current_level == level and formula[i] == self.OR: # only act if in right level. isolate A, B
+                    A, B = self.split(formula, i)
+                    first_part = formula[0:self.recursive_search(formula, i, 'left')]
+                    last_part = formula[self.recursive_search(formula, i, 'right')+1:len(formula)]
+
+                    changed_part = ''
+                    # check for case 1: AND in B
+                    local_level = 0
+                    for j in range(len(B)):
+                        if B[j] == '(': local_level += 1
+                        if B[j] == ')': local_level -= 1
+
+                        # A OR (B1 AND B2) ==> (A OR B1) AND (A OR B2)
+                        if local_level == 1 and B[j] == self.AND:
+                            B1, B2 = self.split(B, j)
+                            changed_part = ' ( ' + ' '.join(A) + ' ' + self.OR + ' ' + ' '.join(B1) + ' ) '
+                            changed_part += self.AND + ' ( ' + ' '.join(A) + ' ' + self.OR + ' ' + ' '.join(B2) + ' ) '
+                            break
+
+                    # check for case 2: AND in A
+                    if changed_part == '': # only if not already case 1
+                        local_level = 0
+                        for j in range(len(A)):
+                            if A[j] == '(': local_level += 1
+                            if A[j] == ')': local_level -= 1
+      
+                            # (A1 AND A2) OR B ==> (A1 OR B) AND (A2 OR B)
+                            if local_level == 1 and A[j] == self.AND:
+                                A1, A2 = self.split(A, j)
+                                changed_part = ' ( ' + ' '.join(A1) + ' ' + self.OR + ' ' + ' '.join(B) + ' ) '
+                                changed_part += self.AND + ' ( ' + ' '.join(A2) + ' ' + self.OR + ' ' + ' '.join(B) + ' ) '
+                                break
+
+                    if changed_part != '':
+                        formula = ' '.join(first_part) + changed_part + ' '.join(last_part)
+                        print 'Rebuilding formula =', formula
+                        formula = self.to_list(formula)
+                        max_level = ' '.join(formula).count('(')
+                        print 'New nesting depth:', max_level
+                        restart_level = True
+
+        print 'returning formula =', ' '.join(formula)
+        return ' '.join(formula)
+
+    def split(self, formula, i):
+        ''' Returns the two neighbours of a conjunction. '''
+        if formula[i] not in self.conjunctions:
+            raise UnexpectedTokenError('can only find neighbours of conjunctions')
+
+        #print 'Searching with i =', i, 'formula =', formula
+        idx = self.recursive_search(formula, i, 'left')
+        A = formula[idx:i]
+
+        idx = self.recursive_search(formula, i, 'right')
+        B = formula[i+1:idx+1]
+        return A, B
+
     def latex(self):
         ''' Returns the formula in LaTeX-syntax. '''
         formula = self.formula
@@ -493,3 +601,8 @@ class TimeOutError(Exception):
 class MaximalNestingSizeError(Exception):
     def __init__(self, arg):
         self.value = arg
+
+class UnexpectedTokenError(Exception):
+    def __init__(self, arg):
+        self.value = arg
+
