@@ -54,7 +54,7 @@ You can now enter one of the examples or test
 
 
 ### UML
-![](https://raw.github.com/captainfox/cp-logic/master/UML.png?login=captainfox&token=7ebb4cd1faeb4ee5c28e1fe7605bbbbd)
+![](https://raw.github.com/captainfox/cp-logic/master/UML.png?token=1068130__eyJzY29wZSI6IlJhd0Jsb2I6Y2FwdGFpbmZveC9jcC1sb2dpYy9tYXN0ZXIvVU1MLnBuZyIsImV4cGlyZXMiOjEzODU0NzUxMTF9--914294d347bdaac58dc64b5255b22c870256721d)
 
 ### Tests
 To start the tests, enter
