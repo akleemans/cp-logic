@@ -7,6 +7,15 @@ Some tools for classical propositional logic - my bachelor thesis.
 * Python 2.7
 * [Pyside](http://qt-project.org/wiki/PySideDownloads), the QT library for Python
 
+Note: For Ubuntu, simply enter
+
+    sudo add-apt-repository ppa:pyside
+    sudo apt-get update
+    sudo apt-get install python-pyside
+
+to install Pyside.
+For other OS see the link above (binary libraries for Windows, MAC and Linux are provided).
+
 ## Getting started
 To get started, just enter
 
@@ -24,22 +33,123 @@ You can now enter one of the examples or test
 
 ## Examples
 
+When entering a formula, you can enter either in plain ASCII or copy-paste Unicode.
+The tokens you can use are listed here:
+
+| ASCII token  | symbol | meaning                                                             |
+|:-------------|:-------|:--------------------------------------------------------------------|
+| `p0`         |  p₀    | A basic proposition. Must contain an index number.                  |
+| `AND`        |  ∧     | logical AND                                                         |
+| `OR`         |  ∨     | logical OR                                                          |
+| `NOT`        |  ¬     | logical NOT                                                         |
+| `IMPL`       |  →     | implication                                                         |
+| `TOP`        |  ⊤     | TOP (always evaluated as true)                                      |
+| `BOTTOM`     |  ⊥     | BOTTOM (always evaluated as false)                                  |
+| `( )`        |  ( )   | brackets, can be used to structure the formula                      |
+| `A`          |  A     | capital letters always stand for metavariables                      |
+
+### Defining a formula
+
+You can either just enter a formula right away
+
     p0 AND p1
+    p3 OR NOT (p1 AND TOP)
+
+or you can make an assignment to a so-called meta-variable.
+You can use the capital letters A-Z for storing formulas.
+
+    A = NOT p0 AND (p1 AND p2 IMPL NOT p1)
+    B = p3 OR NOT (p2 AND p4)
+
+Metavariables will always be evaluated first, so you can use them along or even in the middle of other formulas:
+
+    C = A AND NOT B
+
+### Change form
+
+Once you have some formulas stored (or you can also enter them directly), you can change their forms.
+For example, the **normal negation** form can be obtained with
+
     nnf(p0 AND p1 IMPL p2)
-    A = p0 OR p1 OR NOT (p2 AND NOT p3)
+
+which will result in `(¬p₀ ∨ ¬p₁) ∨ p₂`. You can also assign it directly to another variable:
+
+    D = nnf(A OR p2)
+
+For further investigation, it's important to have a binary tree of a given formula.
+There's an intern representation of the formulat called `pedantic`, which you can also call explicitly.
+
+    C = pedantic(B)
+
+The **conjunctive normal** form you get with
+
+    cnf(D)
+
+Here too you can use the 'form-modifiers' directly in the middle of a formula, they will be evaluated first:
+
+    C = cnf(A) OR NOT nnf(NOT B OR p0)
+
+### Apply a function
+
+For a simple satisfiability test, use
+
     sat(A)
+
+which will return if A is satisfiable and if yes, which valuation it satisfies.
+
+For the clause set (which will be obtained through CNF) enter
+
+    clause_set(A)
+
+which will provide the corresponding set in set notation.
+For the length, enter
+
     l(A)
-    B = NOT p0 AND NOT p1 IMPL (p2 OR NOT p3)
-    nnf(B)
+
+and the elements of the formula will be counted and shown as an integer.
+
+Formulas can also be divided and subdivided in their subformulas.
+For a given formula, all subformulas are shown using
+
     sufo(B)
-    C = p0 AND p1 AND p2 AND NOT p3 AND NOT p4 AND p5
-    pedantic(C)
+
+Note that here and also with other functions, the result of the function strongly depends on the form of the formula.
+For example
+
+    sufo(p0 IMPL p1)
+
+and
+
+    sufo(nnf(p0 IMPL p1))
+
+will result in a different set of subformulas.
+
+For a representation that you can copy-paste into LaTeX, use the `latex`-command:
+
     latex(C)
-    sat(p0 AND NOT p1)
+
+TODO:
+
+    dchains()
+    resolution()
+
+Functions are nestable to the first degree.
+If a function is specified with a certain form (cnf, nnf, pedantic) it will be resolved first before the function is applied.
+
+    l(nnf(A))
+    sufo(cnf(A))
+    latex(pedantic(A))
+
+### Other functions (wip)
+
+    help()
+    clear()
+    set_nesting_depth(20)
 
 ## Documentation
 
 ### Funtions
+
 | function       | meaning                                                                      |
 |:---------------|:-----------------------------------------------------------------------------|
 | `l()`          | Returns the length of a given formula                                        |
@@ -49,6 +159,7 @@ You can now enter one of the examples or test
 | `nnf()`        | Returns a formula in negation normal form                                    |
 | `cnf()`        | Returns a formula in conjunctive normal form                                 |
 | `sat()`        | Returns, if possible, a valid valuation for the given formula                |
+| `clause_set()` | Calculates the corresponding clause set for a given formula                  |
 | `dchains()`    | Use D-chains to prove formula                                                |
 | `resolution()` | Apply resolution                                                             |
 
