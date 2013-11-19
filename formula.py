@@ -74,13 +74,16 @@ class Formula(object):
         if len(residue) != 0:
             raise FormulaInvalidError('illegal characters: '+residue)
 
+        # removing spaces
+        while len(formula) != len(formula.replace('  ', ' ')):
+            formula = formula.replace('  ', ' ')
+
         # adding spaces
         f = ''
-        conn = self.connectives
         for i in range(len(formula)):
             c = formula[i]
             f += c
-            if c in conn or c in self.brackets:
+            if c in self.connectives or c in self.brackets:
                 if i < len(formula)-1 and formula[i+1] != ' ':
                     f += ' '
             if c in self.numbers:
@@ -274,16 +277,14 @@ class Formula(object):
                     brackets.append(str(i) + ':' + str(current_level) + str(current_level - 1))
                     current_level -= 1
 
-            print 'formula:', ' '.join(formula)
-            print 'brackets:', brackets
+            #print 'formula:', ' '.join(formula)
+            #print 'brackets:', brackets
 
             # remove multiple brackets
             for i in range(len(brackets)):
                 if i < len(brackets)-1: # not operating on last element
                     if int(brackets[i].split(':')[0]) + 1 == int(brackets[i+1].split(':')[0]): # consecutive brackets
                         for j in range(i+2, len(brackets)-1): # check if ending pair matches
-                            #print 'First pair:', brackets[i].split(':')[1], ' | ', brackets[j+1].split(':')[1][::-1]
-                            #print 'Second pair:', brackets[i+1].split(':')[1], ' | ', brackets[j].split(':')[1][::-1]
                             if int(brackets[j].split(':')[0]) + 1 == int(brackets[j+1].split(':')[0]) and brackets[i].split(':')[1] == brackets[j+1].split(':')[1][::-1] and brackets[i+1].split(':')[1] == brackets[j].split(':')[1][::-1]:
                                 found_removable = True
                                 for bracket in brackets[i+2:j]:
@@ -291,10 +292,10 @@ class Formula(object):
                                 if found_removable:
                                     pos1 = int(brackets[i].split(':')[0])
                                     pos2 = int(brackets[j+1].split(':')[0])
-                                    print 'Removing multiple brackets.'
-                                    print 'Before:', ' '.join(formula)
+                                    #print 'Removing multiple brackets.'
+                                    #print 'Before:', ' '.join(formula)
                                     formula = formula[:pos1] + formula[pos1+1:pos2] + formula[pos2+1:]
-                                    print 'After:', ' '.join(formula)
+                                    #print 'After:', ' '.join(formula)
                                     break
 
                 if found_removable: break
@@ -308,10 +309,10 @@ class Formula(object):
                     for bracket in brackets[1:len(brackets)-1]:
                         if bracket.endswith('10'): found_removable = False
                     if found_removable:
-                        print 'Removing outer brackets.'
-                        print 'Before:', ' '.join(formula)
+                        #print 'Removing outer brackets.'
+                        #print 'Before:', ' '.join(formula)
                         formula = formula[1:len(formula)-1]
-                        print 'After:', ' '.join(formula)
+                        #print 'After:', ' '.join(formula)
 
         return ' '.join(formula)
 

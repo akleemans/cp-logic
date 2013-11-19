@@ -482,7 +482,6 @@ class FormulaTest(unittest.TestCase):
         formula = Formula(string)
         self.failUnless(formula.equals(formula.formula_cnf, u'(((¬p₀∨p₂)∧((p₀∨¬p₀)∨p₂))∧((¬p₀∨¬p₃)∧((p₀∨¬p₀)∨¬p₃)))∧((¬p₀∨¬(p₄∨p₅))∧((p₀∨¬p₀)∨¬(p₄∨p₅)))'))
 
-
     ### equals()
 
     def test_equals1(self):

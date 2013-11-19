@@ -39,23 +39,24 @@ You can now enter one of the examples or test
 
 ## Documentation
 
-### Formula-Class
-* `l()`: Returns the length of a given formula
-* `sufo()`: Returns all subformulas from a given formula
-* `latex()`: Returns a latex representation of a given formula
-* `pedantic()`: Returns a pedantic (binary) representation of a given formula
-* `nnf()`: Returns a formula in negation normal form
-* `cnf()`: Returns a formula in conjunctive normal form
+### Funtions
+| function       | meaning                                                                      |
+|:---------------|:-----------------------------------------------------------------------------|
+| `l()`          | Returns the length of a given formula                                        |
+| `sufo()`       | Returns all subformulas from a given formula                                 |
+| `latex()`      | Returns a latex representation of a given formula                            |
+| `pedantic()`   | Returns a pedantic (binary) representation of a given formula                |
+| `nnf()`        | Returns a formula in negation normal form                                    |
+| `cnf()`        | Returns a formula in conjunctive normal form                                 |
+| `sat()`        | Returns, if possible, a valid valuation for the given formula                |
+| `dchains()`    | Use D-chains to prove formula                                                |
+| `resolution()` | Apply resolution                                                             |
 
-### Tools-Class
-* `sat()`: Returns, if possible, a valid valuation for the given formula
-* `dchains()`: Use D-chains to prove formula
-* `resolution()`: Apply resolution
 
 ### UML
 
 
-### Examples
+### Tests
 To start the tests, enter
 
     python tests.py
