@@ -479,10 +479,10 @@ class Tests(unittest.TestCase):
         formula = Formula(string)
         self.failUnless(self.tools.equal(formula.formula_cnf, u'(p₀ ∧ p₁) ∧ (p₂ ∧ ((p₃ ∨ p₄) ∧ (p₃ ∨ p₅)))'))
 
-    def test_cnf8(self):
+    def test_cnf9(self):
         string = '(NOT p0 AND TOP) OR (p2 AND NOT p3 AND NOT (p4 OR p5))'
         formula = Formula(string)
-        self.failUnless(self.tools.equal(formula.formula_cnf, u'(((¬p₀∨p₂)∧((p₀∨¬p₀)∨p₂))∧((¬p₀∨¬p₃)∧((p₀∨¬p₀)∨¬p₃)))∧((¬p₀∨¬(p₄∨p₅))∧((p₀∨¬p₀)∨¬(p₄∨p₅)))'))
+        self.failUnless(self.tools.equal(formula.formula_cnf, u'( ( ( ¬ p₀ ∨ p₂ ) ∧ ( ( p₀ ∨ ¬ p₀ ) ∨ p₂ ) ) ∧ ( ( ¬ p₀ ∨ ¬ p₃ ) ∧ ( ( p₀ ∨ ¬ p₀ ) ∨ ¬ p₃ ) ) ) ∧ ( ( ( ¬ p₀ ∨ ¬ p₄ ) ∧ ( ( p₀ ∨ ¬ p₀ ) ∨ ¬ p₄ ) ) ∧ ( ( ¬ p₀ ∨ ¬ p₅ ) ∧ ( ( p₀ ∨ ¬ p₀ ) ∨ ¬ p₅ ) ) )'))
 
     ### equals()
 
@@ -497,6 +497,32 @@ class Tests(unittest.TestCase):
         string = u'(¬p₀ ∧ (p₀ ∨ ¬p₀))'
         formula = Formula(string)
         self.failUnless(self.tools.equal(self.tools.split(formula.formula, 7)[1], u'(p₀ ∨ ¬p₀)'))
+
+    ### clause_set()
+
+    def test_clauses1(self):
+        string = u'p0 OR NOT p1 OR (NOT p1 AND p2)'
+        formula = Formula(string)
+        self.failUnless(self.tools.equal(formula.clause_set()[0], u'{p₀, ¬p₁, ¬p₁}'))
+        self.failUnless(len(formula.clause_set()) == 2)
+
+    def test_clauses2(self):
+        string = u'p0 OR p1 OR NOT p2 OR (p3 AND p4 AND NOT p5)'
+        formula = Formula(string)
+        self.failUnless(self.tools.equal(formula.clause_set()[0], u'{p₀, p₁, ¬p₂, p₃}'))
+        self.failUnless(len(formula.clause_set()) == 3)
+
+    def test_clauses3(self):
+        string = u'NOT p1 AND (p1 IMPL NOT (p1 AND NOT p2))'
+        formula = Formula(string)
+        self.failUnless(self.tools.equal(formula.clause_set()[0], u'{¬p₁}'))
+        self.failUnless(len(formula.clause_set()) == 2)
+
+    def test_clauses4(self):
+        string = u'(NOT p0 AND TOP) OR (p2 AND NOT p3 AND NOT (p4 OR p5))'
+        formula = Formula(string)
+        self.failUnless(self.tools.equal(formula.clause_set()[0], u'{¬p₀, p₂}'))
+        self.failUnless(len(formula.clause_set()) == 8)
 
 if __name__ == "__main__":
     unittest.main()

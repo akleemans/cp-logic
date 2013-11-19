@@ -31,9 +31,9 @@ class Formula(object):
 
         # calculate variants and normal forms of formula
         self.formula = self.check(formula)
-        self.formula_pedantic = self.to_pedantic(self.formula)
-        self.formula_nnf = self.to_nnf(self.formula_pedantic)
-        self.formula_cnf = self.to_cnf(self.formula_pedantic)
+        self.formula_pedantic = self.to_pedantic()
+        self.formula_nnf = self.to_nnf()
+        self.formula_cnf = self.to_cnf()
 
     def check(self, formula):
         ''' Checks if a formula is valid. '''
@@ -116,7 +116,7 @@ class Formula(object):
 
         return f
 
-    def to_pedantic(self, formula):
+    def to_pedantic(self):
         '''
         Returns the correct/pedantic form of the formula.
         The important rules here are (chapter 2.1):
@@ -134,7 +134,7 @@ class Formula(object):
                 ((p0 AND p1))       ==> p0 AND p1
         '''
 
-        formula = self.tools.to_list(formula)
+        formula = self.tools.to_list(self.formula)
         max_level = 0
         target_level = 0
         current_level = 0
@@ -267,6 +267,25 @@ class Formula(object):
 
         return ' '.join(formula)
 
+    def clause_set(self):
+        '''
+        Returns for a given formula the corresponding clause set.
+        Expects a formula in CNF.
+        '''
+        clauses = self.formula_cnf
+        clauses = clauses.replace('(', '')
+        clauses = clauses.replace(')', '')
+        clauses = clauses.replace(' ', '')
+        clauses = clauses.replace(self.tools.OR, ', ')
+        clauses = clauses.split(self.tools.AND)
+
+        for i in range(len(clauses)):
+            clauses[i] = '{' + clauses[i] + '}'
+
+        #print 'formula in CNF:', self.formula_cnf
+        #print 'Clauses:', clauses
+        return clauses
+
     def sufo(self):
         ''' Returns all subformulas to a given formula. '''
         subformulas = [self.formula_pedantic]
@@ -298,7 +317,7 @@ class Formula(object):
         subformulas.sort(key = len)
         return subformulas
 
-    def to_nnf(self, formula):
+    def to_nnf(self):
         '''
         Calculates the negation normal form of a given formula.
         This is done by first calculating p(A) by removing the implications
@@ -306,7 +325,7 @@ class Formula(object):
         '''
 
         # 1. calculate p(A), the formula without implication
-        formula = self.tools.to_list(formula)
+        formula = self.tools.to_list(self.formula_pedantic)
         for i in range(len(formula)):
             if formula[i] == self.tools.IMPL: # implication found
                 formula[i] = self.tools.OR
@@ -353,7 +372,7 @@ class Formula(object):
 
         return ' '.join(formula)
 
-    def to_cnf(self, formula):
+    def to_cnf(self):
         '''
         Calculates the conjunctive negation form of a given formula.
         As of definition 154 of the script, we apply the (sigma) and (tau)-transformation
@@ -371,7 +390,7 @@ class Formula(object):
         '''
 
         # 1. replace TOP, BOTTOM
-        formula = self.tools.to_list(formula)
+        formula = self.tools.to_list(self.formula_nnf)
         subst = {self.tools.TOP: u'( p\u2080 ' + self.tools.OR + ' ' + self.tools.NOT + u' p\u2080 )',
                  self.tools.BOTTOM: u'( p\u2080 ' + self.tools.AND + ' ' + self.tools.NOT + u' p\u2080 )'}
 

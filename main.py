@@ -89,7 +89,6 @@ class MyApplication(QtGui.QMainWindow, Ui_MainWindow):
                 C = A AND NOT B
                 D = nnf(NOT C)
                 E = cnf(A) AND NOT nnf(NOT B AND p0)
-
         '''
         print '0. Starting with:', text
         # 1. Check if the statement is an assignment
@@ -158,7 +157,8 @@ class MyApplication(QtGui.QMainWindow, Ui_MainWindow):
                 return assignment_flag + ' = ' + f.formula
 
         # 4. b) If function, execute it and show result
-        functions = ['l', 'sufo', 'sat', 'latex', 'dchains']
+        functions = ['l', 'sufo', 'sat', 'latex', 'clause_set', 'dchains']
+        text = text.strip()
 
         if text.split('(')[0] in functions:             # function
             function = text.split('(')[0]
@@ -178,8 +178,8 @@ class MyApplication(QtGui.QMainWindow, Ui_MainWindow):
             elif function == 'sat':
                 try:
                     satisfiable = self.tools.sat(f.formula_nnf)
-                #except AttributeError, e:
-                #    return '[Error: formula invalid]'
+                except AttributeError, e:
+                    return '[Error: formula invalid]'
                 except FormulaInvalidError, e:
                     return '[Error: ' + e.value + ']'
                 except TimeOutError, e:
@@ -216,6 +216,17 @@ class MyApplication(QtGui.QMainWindow, Ui_MainWindow):
                 if name == anon: name = f.formula
                 subformulas = f.sufo()
                 return 'Found the following ' + str(len(subformulas)) +' subformulas:\n' + '\n'.join(subformulas)
+
+            # clause_set
+            elif function == 'clause_set':
+                #try:
+                #    satisfiable = self.tools.sat(f.formula_nnf)
+                #except AttributeError, e:
+                #    return '[Error: formula invalid]'
+                #name = f.name
+                #if name == anon: name = f.formula
+                clause_set = f.clause_set()
+                return 'Found the following ' + str(len(clause_set)) +' clauses:\n' + '\n'.join(clause_set)
 
             # dchains
             elif function == 'dchains':

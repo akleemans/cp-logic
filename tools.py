@@ -74,13 +74,13 @@ class Tools(object):
 
         return max_level
 
-    def sat(self, formula):
+    def sat(self, formula_nnf):
         '''
         Returns if a given formula is satisfiable by brute forcing through all possibilities.
         Will return the first valuation (if existing) which satisfies the formula.
         Expects a formula in NNF.
         '''
-        parts = self.to_list(formula)
+        parts = self.to_list(formula_nnf)
 
         propositions = []
         for part in parts:
