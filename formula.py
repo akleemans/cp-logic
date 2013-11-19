@@ -51,7 +51,7 @@ class Formula(object):
         # calculate variants and normal forms of formula
         self.formula = self.check(formula)
         self.formula_pedantic = self.to_pedantic(self.formula)
-        if (self.VERBOSE): print 'pedantic:', self.formula_pedantic
+        #if (self.VERBOSE): print 'pedantic:', self.formula_pedantic
         self.formula_nnf = self.to_nnf(self.formula_pedantic)
         self.formula_cnf = self.to_cnf(self.formula_pedantic)
 
@@ -127,6 +127,7 @@ class Formula(object):
         formula = ''.join(f)
         self.formula = formula
 
+        # checking for empty formula
         if self.length() == 0:
             raise FormulaInvalidError('empty formula')
 
@@ -174,6 +175,9 @@ class Formula(object):
 
             3. AND, OR are interpreted from left to the right
                 p0 AND p1 AND p2    ==> (p0 AND p1) AND p2
+
+            4. Additionally, unnecessary brackets are removed.
+                ((p0 AND p1))       ==> p0 AND p1
         '''
 
         formula = self.to_list(formula)
@@ -253,6 +257,61 @@ class Formula(object):
             target_level += 1
             conj = []
             positions = []
+
+        # removing brackets
+        #print 'Formula before brackets:', ' '.join(formula)
+        found_removable = True
+
+        while found_removable:
+            found_removable = False
+            brackets = []
+            current_level = 0
+            for i in range(len(formula)):
+                if formula[i] == '(':
+                    brackets.append(str(i) + ':' + str(current_level) + str(current_level + 1))
+                    current_level += 1
+                if formula[i] == ')':
+                    brackets.append(str(i) + ':' + str(current_level) + str(current_level - 1))
+                    current_level -= 1
+
+            print 'formula:', ' '.join(formula)
+            print 'brackets:', brackets
+
+            # remove multiple brackets
+            for i in range(len(brackets)):
+                if i < len(brackets)-1: # not operating on last element
+                    if int(brackets[i].split(':')[0]) + 1 == int(brackets[i+1].split(':')[0]): # consecutive brackets
+                        for j in range(i+2, len(brackets)-1): # check if ending pair matches
+                            #print 'First pair:', brackets[i].split(':')[1], ' | ', brackets[j+1].split(':')[1][::-1]
+                            #print 'Second pair:', brackets[i+1].split(':')[1], ' | ', brackets[j].split(':')[1][::-1]
+                            if int(brackets[j].split(':')[0]) + 1 == int(brackets[j+1].split(':')[0]) and brackets[i].split(':')[1] == brackets[j+1].split(':')[1][::-1] and brackets[i+1].split(':')[1] == brackets[j].split(':')[1][::-1]:
+                                found_removable = True
+                                for bracket in brackets[i+2:j]:
+                                    if bracket.endswith(brackets[i+1].split(':')[1]): found_removable = False
+                                if found_removable:
+                                    pos1 = int(brackets[i].split(':')[0])
+                                    pos2 = int(brackets[j+1].split(':')[0])
+                                    print 'Removing multiple brackets.'
+                                    print 'Before:', ' '.join(formula)
+                                    formula = formula[:pos1] + formula[pos1+1:pos2] + formula[pos2+1:]
+                                    print 'After:', ' '.join(formula)
+                                    break
+
+                if found_removable: break
+
+            # remove outer brackets
+            if not found_removable and len(brackets) >= 2:
+                # find outer brackets and check if they are on positions 0 and len()-1
+                if brackets[0] == '0:01' and brackets[len(brackets)-1].endswith('10') and int(brackets[len(brackets)-1].split(':')[0]) == len(formula)-1:
+                    found_removable = True
+                    # check if they belong to the same pair
+                    for bracket in brackets[1:len(brackets)-1]:
+                        if bracket.endswith('10'): found_removable = False
+                    if found_removable:
+                        print 'Removing outer brackets.'
+                        print 'Before:', ' '.join(formula)
+                        formula = formula[1:len(formula)-1]
+                        print 'After:', ' '.join(formula)
 
         return ' '.join(formula)
 
@@ -549,7 +608,6 @@ class Formula(object):
         Returns if a given formula is satisfiable by brute forcing through all possibilities.
         Will return the first valuation (if existing) which satisfies the formula.
         '''
-
         parts = self.to_list(self.formula_nnf)
 
         propositions = []
