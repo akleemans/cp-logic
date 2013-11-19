@@ -14,7 +14,7 @@ class Tests(unittest.TestCase):
 
     def setUp(self):
         print 'Starting tests...'
-        tools = Tools()
+        self.tools = Tools()
 
     ### formula validation
 
@@ -192,17 +192,17 @@ class Tests(unittest.TestCase):
     def test_mixed_formatting1(self):
         string = u'p0 ∨ p1'
         formula = Formula(string, 'formula1')
-        self.failUnless(tools.equal(formula.formula, u'p₀ ∨ p₁'))
+        self.failUnless(self.tools.equal(formula.formula, u'p₀ ∨ p₁'))
 
     def test_mixed_formatting2(self):
         string = u'p0 ∧ NOT p₂ AND ¬⊤'
         formula = Formula(string, 'formula1')
-        self.failUnless(tools.equal(formula.formula, u'p₀ ∧ ¬ p₂ ∧ ¬ ⊤'))
+        self.failUnless(self.tools.equal(formula.formula, u'p₀ ∧ ¬ p₂ ∧ ¬ ⊤'))
 
     def test_mixed_formatting3(self):
         string = u'p0 OR p₃ ∨ NOT p2 OR (¬p₂ ∧ p1)'
         formula = Formula(string, 'formula1')
-        self.failUnless(tools.equal(formula.formula, u'p₀ ∨ p₃ ∨ ¬ p₂ ∨ ( ¬ p₂ ∧ p₁ )'))
+        self.failUnless(self.tools.equal(formula.formula, u'p₀ ∨ p₃ ∨ ¬ p₂ ∨ ( ¬ p₂ ∧ p₁ )'))
 
 
     # bracket reduction
@@ -210,111 +210,111 @@ class Tests(unittest.TestCase):
     def test_bracket_reduction1(self):
         string = u'(p0)'
         formula = Formula(string)
-        self.failUnless(tools.equal(formula.formula_pedantic, u'p₀'))
+        self.failUnless(self.tools.equal(formula.formula_pedantic, u'p₀'))
 
     def test_bracket_reduction2(self):
         string = u'((p0))'
         formula = Formula(string)
-        self.failUnless(tools.equal(formula.formula_pedantic, u'p₀'))
+        self.failUnless(self.tools.equal(formula.formula_pedantic, u'p₀'))
 
     def test_bracket_reduction3(self):
         string = u'(((p0)))'
         formula = Formula(string)
-        self.failUnless(tools.equal(formula.formula_pedantic, u'p₀'))
+        self.failUnless(self.tools.equal(formula.formula_pedantic, u'p₀'))
 
     def test_bracket_reduction4(self):
         string = u'(p0 AND p1) OR (p2 AND p3)'
         formula = Formula(string)
-        self.failUnless(tools.equal(formula.formula_pedantic, u'(p₀ ∧ p₁) ∨ (p₂ ∧ p₃)'))
+        self.failUnless(self.tools.equal(formula.formula_pedantic, u'(p₀ ∧ p₁) ∨ (p₂ ∧ p₃)'))
 
     def test_bracket_reduction5(self):
         string = u'((p0 AND p1) OR (p2 AND p3))'
         formula = Formula(string)
-        self.failUnless(tools.equal(formula.formula_pedantic, u'(p₀ ∧ p₁) ∨ (p₂ ∧ p₃)'))
+        self.failUnless(self.tools.equal(formula.formula_pedantic, u'(p₀ ∧ p₁) ∨ (p₂ ∧ p₃)'))
 
     def test_bracket_reduction6(self):
         string = u'(p0 AND p1 AND p2)'
         formula = Formula(string)
-        self.failUnless(tools.equal(formula.formula_pedantic, u'( p₀ ∧ p₁ ) ∧ p₂'))
+        self.failUnless(self.tools.equal(formula.formula_pedantic, u'( p₀ ∧ p₁ ) ∧ p₂'))
 
     def test_bracket_reduction7(self):
         string = u'p0 OR ((p1 AND p2)) OR p3'
         formula = Formula(string)
-        self.failUnless(tools.equal(formula.formula_pedantic, u'( p₀ ∨ ( p₁ ∧ p₂ ) ) ∨ p₃'))
+        self.failUnless(self.tools.equal(formula.formula_pedantic, u'( p₀ ∨ ( p₁ ∧ p₂ ) ) ∨ p₃'))
 
     def test_bracket_reduction8(self):
         string = u'p0 AND ((p1 AND p2)) AND p3'
         formula = Formula(string)
-        self.failUnless(tools.equal(formula.formula_pedantic, u'( p₀ ∧ ( p₁ ∧ p₂ ) ) ∧ p₃'))
+        self.failUnless(self.tools.equal(formula.formula_pedantic, u'( p₀ ∧ ( p₁ ∧ p₂ ) ) ∧ p₃'))
 
     def test_bracket_reduction9(self):
         string = u'((p0 AND p1) AND (p2 AND p3)) AND p5'
         formula = Formula(string)
-        self.failUnless(tools.equal(formula.formula_pedantic, u'( ( p₀ ∧ p₁ ) ∧ ( p₂ ∧ p₃ ) ) ∧ p₅'))
+        self.failUnless(self.tools.equal(formula.formula_pedantic, u'( ( p₀ ∧ p₁ ) ∧ ( p₂ ∧ p₃ ) ) ∧ p₅'))
 
     ### length()
 
     def test_formula_length1(self):
         string = 'p0'
         formula = Formula(string)
-        self.failUnless(formula.length() == 1)
+        self.failUnless(self.tools.length(formula.formula) == 1)
 
     def test_formula_length2(self):
         string = 'p0 OR p1 IMPL p2 AND p3'
         formula = Formula(string)
-        self.failUnless(formula.length() == 7)
+        self.failUnless(self.tools.length(formula.formula) == 7)
 
     def test_formula_length3(self):
         string = 'p0 OR p1 IMPL p2 AND NOT p3'
         formula = Formula(string)
-        self.failUnless(formula.length() == 8)
+        self.failUnless(self.tools.length(formula.formula) == 8)
 
     def test_formula_length4(self):
         string = 'p0 OR p1 IMPL p2 AND p0'
         formula = Formula(string)
-        self.failUnless(formula.length() == 7)
+        self.failUnless(self.tools.length(formula.formula) == 7)
 
     def test_formula_length5(self):
         string = 'p0 OR p1 OR p2 OR p3 OR p4 OR p5'
         formula = Formula(string)
-        self.failUnless(formula.length() == 11)
+        self.failUnless(self.tools.length(formula.formula) == 11)
 
     def test_formula_length6(self):
         string = 'p0 OR p0 OR p0 OR p0 OR p0'
         formula = Formula(string)
-        self.failUnless(formula.length() == 9)
+        self.failUnless(self.tools.length(formula.formula) == 9)
 
     ### pedantic()
 
     def test_pedantic1(self):
         string = 'p0 OR p1 IMPL p1 AND p2'
         formula = Formula(string)
-        self.failUnless(tools.equal(formula.formula_pedantic, u'( p₀ ∨ p₁ ) → ( p₁ ∧ p₂ )'))
+        self.failUnless(self.tools.equal(formula.formula_pedantic, u'( p₀ ∨ p₁ ) → ( p₁ ∧ p₂ )'))
 
     def test_pedantic2(self):
         string = 'p0 AND p1 AND p2'
         formula = Formula(string)
-        self.failUnless(tools.equal(formula.formula_pedantic, u'( p₀ ∧ p₁ ) ∧ p₂'))
+        self.failUnless(self.tools.equal(formula.formula_pedantic, u'( p₀ ∧ p₁ ) ∧ p₂'))
 
     def test_pedantic3(self):
         string = 'p0 AND p1 AND p2 AND p3'
         formula = Formula(string)
-        self.failUnless(tools.equal(formula.formula_pedantic, u'( ( p₀ ∧ p₁ ) ∧ p₂ ) ∧ p₃'))
+        self.failUnless(self.tools.equal(formula.formula_pedantic, u'( ( p₀ ∧ p₁ ) ∧ p₂ ) ∧ p₃'))
 
     def test_pedantic4(self):
         string = 'p0 OR p1 OR p2 OR p3 OR p4 OR p5'
         formula = Formula(string)
-        self.failUnless(tools.equal(formula.formula_pedantic, u'( ( ( ( p₀ ∨ p₁ ) ∨ p₂ ) ∨ p₃ ) ∨ p₄ ) ∨ p₅'))
+        self.failUnless(self.tools.equal(formula.formula_pedantic, u'( ( ( ( p₀ ∨ p₁ ) ∨ p₂ ) ∨ p₃ ) ∨ p₄ ) ∨ p₅'))
 
     def test_pedantic5(self):
         string = 'p0 OR p1 OR p2 OR p3 OR p4 OR p5 OR p6 OR p7 OR p8 OR p9 OR p10'
         formula = Formula(string)
-        self.failUnless(tools.equal(formula.formula_pedantic, u'( ( ( ( ( ( ( ( ( p₀ ∨ p₁ ) ∨ p₂ ) ∨ p₃ ) ∨ p₄ ) ∨ p₅ ) ∨ p₆ ) ∨ p₇ ) ∨ p₈ ) ∨ p₉ ) ∨ p₁₀'))
+        self.failUnless(self.tools.equal(formula.formula_pedantic, u'( ( ( ( ( ( ( ( ( p₀ ∨ p₁ ) ∨ p₂ ) ∨ p₃ ) ∨ p₄ ) ∨ p₅ ) ∨ p₆ ) ∨ p₇ ) ∨ p₈ ) ∨ p₉ ) ∨ p₁₀'))
 
     def test_pedantic6(self):
         string = 'p0 OR p1 OR (p2 AND p3 IMPL p1)'
         formula = Formula(string)
-        self.failUnless(tools.equal(formula.formula_pedantic, u'( p₀ ∨ p₁ ) ∨ ( ( p₂ ∧ p₃ ) → p₁ )'))
+        self.failUnless(self.tools.equal(formula.formula_pedantic, u'( p₀ ∨ p₁ ) ∨ ( ( p₂ ∧ p₃ ) → p₁ )'))
 
     def test_pedantic7(self):
         string = 'p0 AND p1 IMPL p2 AND p3 IMPL p4'
@@ -331,17 +331,17 @@ class Tests(unittest.TestCase):
     def test_pedantic9(self):
         string = 'p0 OR p1 OR (p2 AND p3) OR p4'
         formula = Formula(string)
-        self.failUnless(tools.equal(formula.formula_pedantic, u'( ( p₀ ∨ p₁ ) ∨ ( p₂ ∧ p₃ ) ) ∨ p₄'))
+        self.failUnless(self.tools.equal(formula.formula_pedantic, u'( ( p₀ ∨ p₁ ) ∨ ( p₂ ∧ p₃ ) ) ∨ p₄'))
 
     def test_pedantic10(self):
         string = 'p0 OR NOT p1 OR NOT p2 IMPL p0 AND p1 AND p2'
         formula = Formula(string)
-        self.failUnless(tools.equal(formula.formula_pedantic, u'( ( p₀ ∨ ¬ p₁ ) ∨ ¬ p₂ ) → ( ( p₀ ∧ p₁ ) ∧ p₂ )'))
+        self.failUnless(self.tools.equal(formula.formula_pedantic, u'( ( p₀ ∨ ¬ p₁ ) ∨ ¬ p₂ ) → ( ( p₀ ∧ p₁ ) ∧ p₂ )'))
 
     def test_pedantic11(self):
         string = 'p0 OR (p1 AND p2 AND p3) IMPL (p5 AND (p6 OR p7) AND p8)'
         formula = Formula(string)
-        self.failUnless(tools.equal(formula.formula_pedantic, u'p₀ ∨ ( ( p₁ ∧ p₂ ) ∧ p₃ ) → ( p₅ ∧ ( p₆ ∨ p₇ ) ) ∧ p₈'))
+        self.failUnless(self.tools.equal(formula.formula_pedantic, u'p₀ ∨ ( ( p₁ ∧ p₂ ) ∧ p₃ ) → ( p₅ ∧ ( p₆ ∨ p₇ ) ) ∧ p₈'))
 
     ### nnf()
 
@@ -442,61 +442,61 @@ class Tests(unittest.TestCase):
     def test_cnf1(self):
         string = 'p0'
         formula = Formula(string)
-        self.failUnless(tools.equal(formula.formula_cnf, u'p₀'))
+        self.failUnless(self.tools.equal(formula.formula_cnf, u'p₀'))
 
     def test_cnf2(self):
         string = 'TOP'
         formula = Formula(string)
-        self.failUnless(tools.equal(formula.formula_cnf, u'(p₀ ∨ ¬ p₀)'))
+        self.failUnless(self.tools.equal(formula.formula_cnf, u'(p₀ ∨ ¬ p₀)'))
 
     def test_cnf3(self):
         string = 'TOP AND p0'
         formula = Formula(string)
-        self.failUnless(tools.equal(formula.formula_cnf, u'(p₀ ∨ ¬ p₀) ∧ p₀'))
+        self.failUnless(self.tools.equal(formula.formula_cnf, u'(p₀ ∨ ¬ p₀) ∧ p₀'))
 
     def test_cnf4(self):
         string = 'TOP OR BOTTOM'
         formula = Formula(string)
-        self.failUnless(tools.equal(formula.formula_cnf, u'((p₀ ∨ ¬p₀) ∨ p₀) ∧ ((p₀ ∨ ¬p₀) ∨ ¬p₀)'))
+        self.failUnless(self.tools.equal(formula.formula_cnf, u'((p₀ ∨ ¬p₀) ∨ p₀) ∧ ((p₀ ∨ ¬p₀) ∨ ¬p₀)'))
 
     def test_cnf5(self):
         string = 'NOT TOP'
         formula = Formula(string)
-        self.failUnless(tools.equal(formula.formula_cnf, u'¬ (p₀ ∨ ¬ p₀)'))
+        self.failUnless(self.tools.equal(formula.formula_cnf, u'¬ (p₀ ∨ ¬ p₀)'))
 
     def test_cnf6(self):
         string = 'p0 OR (p1 AND p2)'
         formula = Formula(string)
-        self.failUnless(tools.equal(formula.formula_cnf, u'(p₀ ∨ p₁) ∧ (p₀ ∨ p₂)'))
+        self.failUnless(self.tools.equal(formula.formula_cnf, u'(p₀ ∨ p₁) ∧ (p₀ ∨ p₂)'))
 
     def test_cnf7(self):
         string = '(p0 AND p1) OR (p2 AND p3)'
         formula = Formula(string)
-        self.failUnless(tools.equal(formula.formula_cnf, u'((p₀ ∨ p₂) ∧ (p₁ ∨ p₂)) ∧ ((p₀ ∨ p₃) ∧ (p₁ ∨ p₃))'))
+        self.failUnless(self.tools.equal(formula.formula_cnf, u'((p₀ ∨ p₂) ∧ (p₁ ∨ p₂)) ∧ ((p₀ ∨ p₃) ∧ (p₁ ∨ p₃))'))
 
     def test_cnf8(self):
         string = '(p0 AND p1) AND (p2 AND (p3 OR (p4 AND p5)))'
         formula = Formula(string)
-        self.failUnless(tools.equal(formula.formula_cnf, u'(p₀ ∧ p₁) ∧ (p₂ ∧ ((p₃ ∨ p₄) ∧ (p₃ ∨ p₅)))'))
+        self.failUnless(self.tools.equal(formula.formula_cnf, u'(p₀ ∧ p₁) ∧ (p₂ ∧ ((p₃ ∨ p₄) ∧ (p₃ ∨ p₅)))'))
 
     def test_cnf8(self):
         string = '(NOT p0 AND TOP) OR (p2 AND NOT p3 AND NOT (p4 OR p5))'
         formula = Formula(string)
-        self.failUnless(tools.equal(formula.formula_cnf, u'(((¬p₀∨p₂)∧((p₀∨¬p₀)∨p₂))∧((¬p₀∨¬p₃)∧((p₀∨¬p₀)∨¬p₃)))∧((¬p₀∨¬(p₄∨p₅))∧((p₀∨¬p₀)∨¬(p₄∨p₅)))'))
+        self.failUnless(self.tools.equal(formula.formula_cnf, u'(((¬p₀∨p₂)∧((p₀∨¬p₀)∨p₂))∧((¬p₀∨¬p₃)∧((p₀∨¬p₀)∨¬p₃)))∧((¬p₀∨¬(p₄∨p₅))∧((p₀∨¬p₀)∨¬(p₄∨p₅)))'))
 
     ### equals()
 
     def test_equals1(self):
         f1 = Formula('(NOT p0 AND TOP) OR (p2 AND NOT p3 AND NOT (p4 OR p5))')
         f2 = Formula(u'(¬p₀ ∧ ⊤) ∨ (p₂ ∧ ¬p₃ ∧ ¬(p₄ ∨ p₅))')
-        self.failUnless(tools.equal(f1.formula_cnf, f2.formula_cnf))
+        self.failUnless(self.tools.equal(f1.formula_cnf, f2.formula_cnf))
 
     ### split()
 
     def test_split1(self):
         string = u'(¬p₀ ∧ (p₀ ∨ ¬p₀))'
         formula = Formula(string)
-        self.failUnless(tools.equal(formula.split(formula.formula, 7)[1], u'(p₀ ∨ ¬p₀)'))
+        self.failUnless(self.tools.equal(self.tools.split(formula.formula, 7)[1], u'(p₀ ∨ ¬p₀)'))
 
 if __name__ == "__main__":
     unittest.main()

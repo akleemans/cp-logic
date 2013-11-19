@@ -9,6 +9,7 @@ Represents a formula and its exceptions.
 import re
 import locale
 import time
+from tools import *
 
 locale.setlocale(locale.LC_ALL, '')
 
@@ -26,31 +27,11 @@ class Formula(object):
         '''
         # name
         self.name = name
-
-        # static
-        self.MAXIMUM_NESTING_LEVEL = 20
-        self.VERBOSE = False
-
-        self.brackets = ['(', ')']
-
-        self.NOT = u'\u00AC'
-        self.AND = u'\u2227'
-        self.OR = u'\u2228'
-        self.IMPL = u'\u2192'
-        self.conjunctions = [self.AND, self.OR, self.IMPL]
-
-        self.TOP = u'\u22A4'
-        self.BOTTOM = u'\u22A5'
-        self.atomic_propositions = [self.TOP, self.BOTTOM]
-        self.connectives = self.conjunctions + [self.NOT] + self.atomic_propositions
-
-        self.numbers = [u'\u2080', u'\u2081', u'\u2082', u'\u2083', u'\u2084', u'\u2085', u'\u2086', u'\u2087',
-                        u'\u2088', u'\u2089']
+        self.tools = Tools()
 
         # calculate variants and normal forms of formula
         self.formula = self.check(formula)
         self.formula_pedantic = self.to_pedantic(self.formula)
-        #if (self.VERBOSE): print 'pedantic:', self.formula_pedantic
         self.formula_nnf = self.to_nnf(self.formula_pedantic)
         self.formula_cnf = self.to_cnf(self.formula_pedantic)
 
@@ -59,8 +40,8 @@ class Formula(object):
 
         substitutes = {u'0': u'\u2080', u'1': u'\u2081', u'2': u'\u2082', u'3': u'\u2083', u'4': u'\u2084',
                        u'5': u'\u2085', u'6': u'\u2086', u'7': u'\u2087', u'8': u'\u2088', u'9': u'\u2089',
-                       u'AND': self.AND, u'OR': self.OR, u'NOT': self.NOT, u'IMPL': self.IMPL,
-                       u'TOP': self.TOP, u'BOTTOM': self.BOTTOM}
+                       u'AND': self.tools.AND, u'OR': self.tools.OR, u'NOT': self.tools.NOT, u'IMPL': self.tools.IMPL,
+                       u'TOP': self.tools.TOP, u'BOTTOM': self.tools.BOTTOM}
 
         for a, b in substitutes.items():
             formula = formula.replace(a, b)
@@ -82,11 +63,11 @@ class Formula(object):
         for i in range(len(formula)):
             c = formula[i]
             f += c
-            if c in self.connectives or c in self.brackets:
+            if c in self.tools.connectives or c in self.tools.brackets:
                 if i < len(formula)-1 and formula[i+1] != ' ':
                     f += ' '
-            if c in self.numbers:
-                if i < len(formula)-1 and formula[i+1] not in self.numbers and formula[i+1] != ' ':
+            if c in self.tools.numbers:
+                if i < len(formula)-1 and formula[i+1] not in self.tools.numbers and formula[i+1] != ' ':
                     f += ' '
 
         # checking for propositions
@@ -99,26 +80,26 @@ class Formula(object):
 
         # checking lonely numbers
         for i in range(len(formula)):
-            if i == 0 and formula[i] in self.numbers:
+            if i == 0 and formula[i] in self.tools.numbers:
                 raise FormulaInvalidError('indices must belong to a proposition')
-            if formula[i] in self.numbers and formula[i-1] not in self.numbers + [u'p']:
+            if formula[i] in self.tools.numbers and formula[i-1] not in self.tools.numbers + [u'p']:
                 raise FormulaInvalidError('indices must belong to a proposition')
 
         # checking for negations
         for i in range(len(parts)):
             part = parts[i]
-            if part == self.NOT and i < len(parts)-1:
-                if parts[i+1] == ')' or parts[i+1] in self.conjunctions:
+            if part == self.tools.NOT and i < len(parts)-1:
+                if parts[i+1] == ')' or parts[i+1] in self.tools.conjunctions:
                     raise FormulaInvalidError('illegal negation')
-            if part == self.NOT and i == len(parts)-1:
+            if part == self.tools.NOT and i == len(parts)-1:
                 raise FormulaInvalidError('illegal negation')
 
         # checking for conjunctions
         for i in range(len(parts)):
             part = parts[i]
-            if part in self.conjunctions:
+            if part in self.tools.conjunctions:
                 if i < len(parts) - 1:
-                    if parts[i+1] in self.conjunctions or parts[i+1] == ')':
+                    if parts[i+1] in self.tools.conjunctions or parts[i+1] == ')':
                         raise FormulaInvalidError('illegal conjunction')
                 if i == 0:
                         raise FormulaInvalidError('illegal conjunction')
@@ -130,39 +111,10 @@ class Formula(object):
         self.formula = formula
 
         # checking for empty formula
-        if self.length() == 0:
+        if self.tools.length(formula) == 0:
             raise FormulaInvalidError('empty formula')
 
         return f
-
-    def recursive_search(self, formula, index, direction):
-        ''' Returns the position of the part which lies on the same level in the formula. '''
-
-        if direction == 'left':
-            d = -1
-        elif direction == 'right':
-            d = 1
-        else:
-            raise ValueError
-
-        pos = index + d
-
-        local_level = 0
-        while True:
-            if formula[pos] == ')':
-                local_level -= 1
-            elif formula[pos] == '(':
-                local_level += 1
-
-            if local_level > self.MAXIMUM_NESTING_LEVEL:
-                raise MaximalNestingSizeError('maximal nesting size reached.')
-
-            if local_level == 0 and formula[pos][0] in ['p', '(', ')']:
-                if direction == 'left' and formula[pos-1] == self.NOT:
-                    return pos-1
-                else:
-                    return pos
-            pos += d
 
     def to_pedantic(self, formula):
         '''
@@ -182,7 +134,7 @@ class Formula(object):
                 ((p0 AND p1))       ==> p0 AND p1
         '''
 
-        formula = self.to_list(formula)
+        formula = self.tools.to_list(formula)
         max_level = 0
         target_level = 0
         current_level = 0
@@ -196,18 +148,18 @@ class Formula(object):
                    # print "in the correct level. conj = ", conj
 
                     # check for invalid formulas.
-                    a = self.AND + self.OR
-                    b = self.OR + self.AND
+                    a = self.tools.AND + self.tools.OR
+                    b = self.tools.OR + self.tools.AND
                     conj_str = ''.join(conj)
-                    if self.AND in conj and self.OR in conj and (a in conj_str or b in conj_str):
+                    if self.tools.AND in conj and self.tools.OR in conj and (a in conj_str or b in conj_str):
                         raise FormulaInvalidError('mixed AND and OR on same level')
-                    elif sum([1 for x in conj if x == self.IMPL]) > 1:
+                    elif sum([1 for x in conj if x == self.tools.IMPL]) > 1:
                         raise FormulaInvalidError('more than one implication on the same level')
                     else:
                         pos_groups = []
 
-                        if self.IMPL in conj:
-                            idx = conj.index(self.IMPL) #print 'Index of impl at', idx
+                        if self.tools.IMPL in conj:
+                            idx = conj.index(self.tools.IMPL) #print 'Index of impl at', idx
                             pos_groups.append(positions[:idx])
                             pos_groups.append(positions[idx+1:])
                         else:
@@ -224,10 +176,10 @@ class Formula(object):
                             # set brackets recursively until list has only 1 conjunction left
                             while len(positions) >= max_brackets:
                                 #print "setting brackets for positions =", positions
-                                pos = self.recursive_search(formula, positions[0], 'left')
+                                pos = self.tools.recursive_search(formula, positions[0], 'left')
                                 formula.insert(pos, '(')
 
-                                pos = self.recursive_search(formula, positions[0]+1, 'right')
+                                pos = self.tools.recursive_search(formula, positions[0]+1, 'right')
                                 formula.insert(pos+1, ')')
 
                                 #conj.pop(0)
@@ -251,7 +203,7 @@ class Formula(object):
 
                 # get conjunctions on current level
                 if current_level == target_level:
-                    if formula[i] in self.conjunctions:
+                    if formula[i] in self.tools.conjunctions:
                         positions.append(i)
                         conj.append(formula[i])
 
@@ -315,18 +267,6 @@ class Formula(object):
 
         return ' '.join(formula)
 
-    def to_list(self, formula):
-        ''' Splits a formula to a list of symbols. '''
-        formula = formula.split(' ')
-        formula2 = []
-        for i in range(len(formula)):
-            if formula[i] in self.numbers:
-                formula2[-1] = formula2[-1] + formula[i].strip()
-            else:
-                formula2.append(formula[i].strip())
-
-        return formula2
-
     def sufo(self):
         ''' Returns all subformulas to a given formula. '''
         subformulas = [self.formula_pedantic]
@@ -335,38 +275,28 @@ class Formula(object):
         while element_count < len(subformulas):
             # walk through newly added elements
             for i in range(element_count, len(subformulas)):
-                element = self.to_list(subformulas[i])
+                element = self.tools.to_list(subformulas[i])
                 element_count += 1
                 for j in range(len(element)):
 
                     # 1. conjunction rule: add both parts to the subformula set
-                    if element[j] in self.conjunctions:
-                        idx = self.recursive_search(element, j, 'left') # left part
+                    if element[j] in self.tools.conjunctions:
+                        idx = self.tools.recursive_search(element, j, 'left') # left part
                         new_element = ' '.join(element[idx:j])
                         if new_element not in subformulas: subformulas.append(new_element)
 
-                        idx = self.recursive_search(element, j, 'right') # right part
+                        idx = self.tools.recursive_search(element, j, 'right') # right part
                         new_element = ' '.join(element[j+1:idx+1])
                         if new_element not in subformulas: subformulas.append(new_element)
 
                     # 2. NOT rule: add the part after the negation to the sufo-set
-                    elif element[j] == self.NOT:
-                        idx = self.recursive_search(element, j, 'right')
+                    elif element[j] == self.tools.NOT:
+                        idx = self.tools.recursive_search(element, j, 'right')
                         new_element = ' '.join(element[j+1:idx+1])
                         if new_element not in subformulas: subformulas.append(new_element)
 
         subformulas.sort(key = len)
         return subformulas
-
-    def length(self):
-        ''' Returns the length of a given formula. '''
-        parts = self.to_list(self.formula)
-        count = []
-        conn = self.connectives
-        for part in parts:
-            if part not in self.brackets and part != '' and part != ' ':
-                count.append(part)
-        return len(count)
 
     def to_nnf(self, formula):
         '''
@@ -376,12 +306,12 @@ class Formula(object):
         '''
 
         # 1. calculate p(A), the formula without implication
-        formula = self.to_list(formula)
+        formula = self.tools.to_list(formula)
         for i in range(len(formula)):
-            if formula[i] == self.IMPL: # implication found
-                formula[i] = self.OR
+            if formula[i] == self.tools.IMPL: # implication found
+                formula[i] = self.tools.OR
                 if formula[i-1].startswith('p'):
-                    formula.insert(i-1, self.NOT)
+                    formula.insert(i-1, self.tools.NOT)
                 elif formula[i-1] == ')':
                     level = -1
                     for index in range(i-2, -1, -1):
@@ -389,7 +319,7 @@ class Formula(object):
                         elif formula[index] == '(': level += 1
 
                         if level == 0:
-                            formula.insert(index, self.NOT)
+                            formula.insert(index, self.tools.NOT)
                             break
 
                 else:
@@ -399,25 +329,25 @@ class Formula(object):
         max_length = len(formula)
         i = 0
         while i < max_length:
-            if formula[i] == self.NOT:
-                if formula[i+1] == self.NOT:    # double negation found
+            if formula[i] == self.tools.NOT:
+                if formula[i+1] == self.tools.NOT:    # double negation found
                     formula.pop(i)
                     formula.pop(i)
                     i -= 1
                     max_length -= 2
                 elif formula[i+1] == '(':      # 'bad' negation found
                     formula.pop(i)
-                    formula.insert(i+1, self.NOT)
+                    formula.insert(i+1, self.tools.NOT)
 
                     level = 0
                     for index in range(i+2, len(formula)):
                         if formula[index] == ')': level -= 1
                         elif formula[index] == '(': level += 1
 
-                        if level == 0 and (formula[index] in self.conjunctions):
-                            if formula[index] == self.OR: formula[index] = self.AND
-                            elif formula[index] == self.AND: formula[index] = self.OR
-                            formula.insert(index+1, self.NOT)
+                        if level == 0 and (formula[index] in self.tools.conjunctions):
+                            if formula[index] == self.tools.OR: formula[index] = self.tools.AND
+                            elif formula[index] == self.tools.AND: formula[index] = self.tools.OR
+                            formula.insert(index+1, self.tools.NOT)
                             break
             i += 1
 
@@ -441,22 +371,22 @@ class Formula(object):
         '''
 
         # 1. replace TOP, BOTTOM
-        formula = self.to_list(formula)
-        subst = {self.TOP: u'( p\u2080 ' + self.OR + ' ' + self.NOT + u' p\u2080 )',
-                 self.BOTTOM: u'( p\u2080 ' + self.AND + ' ' + self.NOT + u' p\u2080 )'}
+        formula = self.tools.to_list(formula)
+        subst = {self.tools.TOP: u'( p\u2080 ' + self.tools.OR + ' ' + self.tools.NOT + u' p\u2080 )',
+                 self.tools.BOTTOM: u'( p\u2080 ' + self.tools.AND + ' ' + self.tools.NOT + u' p\u2080 )'}
 
         for i in range(len(formula)):
-            if formula[i] in [self.TOP, self.BOTTOM]:
+            if formula[i] in [self.tools.TOP, self.tools.BOTTOM]:
                 formula[i] = subst[formula[i]]
 
         # recompile formula
         temp = ' '.join(formula)
-        formula = self.to_list(temp)
+        formula = self.tools.to_list(temp)
 
         # 2. replace subformulas
         # get level depth
-        max_level = self.get_depth(formula)
-        if (self.VERBOSE): print 'Nesting depth:', max_level
+        max_level = self.tools.get_depth(formula)
+        if (self.tools.VERBOSE): print 'Nesting depth:', max_level
 
         # replace subformulas from top level to bottom
         current_level = 0
@@ -477,15 +407,15 @@ class Formula(object):
                 if formula[i] == '(': current_level += 1
                 if formula[i] == ')': current_level -= 1
 
-                if current_level > self.MAXIMUM_NESTING_LEVEL:
+                if current_level > self.tools.MAXIMUM_NESTING_LEVEL:
                     raise MaximalNestingSizeError('maximal nesting size reached.')
 
                 #print 'formula[i] =', formula[i], ', level =', level, ', current_level =', current_level
 
-                if current_level == level and formula[i] == self.OR: # only act if in right level. isolate A, B
-                    A, B = self.split(formula, i)
-                    first_part = formula[0:self.recursive_search(formula, i, 'left')]
-                    last_part = formula[self.recursive_search(formula, i, 'right')+1:len(formula)]
+                if current_level == level and formula[i] == self.tools.OR: # only act if in right level. isolate A, B
+                    A, B = self.tools.split(formula, i)
+                    first_part = formula[0:self.tools.recursive_search(formula, i, 'left')]
+                    last_part = formula[self.tools.recursive_search(formula, i, 'right')+1:len(formula)]
 
                     changed_part = ''
                     # check for case 1: AND in B
@@ -495,13 +425,13 @@ class Formula(object):
                         if B[j] == ')': local_level -= 1
 
                         # A OR (B1 AND B2) ==> (A OR B1) AND (A OR B2)
-                        if local_level == 1 and B[j] == self.AND:
-                            B1, B2 = self.split(B, j)
+                        if local_level == 1 and B[j] == self.tools.AND:
+                            B1, B2 = self.tools.split(B, j)
                             #print 'Splitting B =', ' '.join(B)
                             #print 'B1 = ', ' '.join(B1)
                             #print 'B2 = ', ' '.join(B2)
-                            changed_part = ' ( ' + ' '.join(A) + ' ' + self.OR + ' ' + ' '.join(B1) + ' ) '
-                            changed_part += self.AND + ' ( ' + ' '.join(A) + ' ' + self.OR + ' ' + ' '.join(B2) + ' ) '
+                            changed_part = ' ( ' + ' '.join(A) + ' ' + self.tools.OR + ' ' + ' '.join(B1) + ' ) '
+                            changed_part += self.tools.AND + ' ( ' + ' '.join(A) + ' ' + self.tools.OR + ' ' + ' '.join(B2) + ' ) '
                             break
 
                     # check for case 2: AND in A
@@ -512,14 +442,14 @@ class Formula(object):
                             if A[j] == ')': local_level -= 1
 
                             # (A1 AND A2) OR B ==> (A1 OR B) AND (A2 OR B)
-                            if local_level == 1 and A[j] == self.AND:
-                                A1, A2 = self.split(A, j)
+                            if local_level == 1 and A[j] == self.tools.AND:
+                                A1, A2 = self.tools.split(A, j)
                                 #print 'Splitting A =', ' '.join(A)
                                 #print 'A =', A
                                 #print 'A1 = ', ' '.join(A1)
                                 #print 'A2 = ', ' '.join(A2)
-                                changed_part = ' ( ' + ' '.join(A1) + ' ' + self.OR + ' ' + ' '.join(B) + ' ) '
-                                changed_part += self.AND + ' ( ' + ' '.join(A2) + ' ' + self.OR + ' ' + ' '.join(B) + ' ) '
+                                changed_part = ' ( ' + ' '.join(A1) + ' ' + self.tools.OR + ' ' + ' '.join(B) + ' ) '
+                                changed_part += self.tools.AND + ' ( ' + ' '.join(A2) + ' ' + self.tools.OR + ' ' + ' '.join(B) + ' ) '
                                 break
 
                     if changed_part != '':
@@ -531,13 +461,13 @@ class Formula(object):
                         #print 'changed part: ', changed_part
                         #print 'last part: ', ' '.join(last_part)
                         #print 'formula =', formula
-                        formula = self.to_list(formula)
+                        formula = self.tools.to_list(formula)
                         self.validate_brackets(formula) # check
-                        max_level = self.get_depth(formula)
+                        max_level = self.tools.get_depth(formula)
                         #print 'New nesting depth:', max_level
                         restart_level = True
 
-        if (self.VERBOSE): print 'CNF: returning formula =', ' '.join(formula)
+        if (self.tools.VERBOSE): print 'CNF: returning formula =', ' '.join(formula)
         return ' '.join(formula)
 
     def validate_brackets(self, formula):
@@ -563,32 +493,6 @@ class Formula(object):
             raise FormulaInvalidError('too many closing brackets')
 
         return
-
-    def get_depth(self, formula):
-        ''' Returns the depth (= maximal nesting level) of a formula. '''
-        max_level = 0
-        current_level = 0
-        for part in formula:
-            if part == '(': current_level += 1
-            elif part == ')': current_level -= 1
-            max_level = max(current_level, max_level)
-
-        return max_level
-
-    def split(self, formula, i):
-        ''' Returns the two neighbours of a conjunction. '''
-        if formula[i] not in self.conjunctions:
-            print 'got "' + formula[i] + '" instead'
-            raise UnexpectedTokenError('can only find neighbours of conjunctions.')
-
-        #print 'Searching with i =', i, 'formula =', formula
-        idx = self.recursive_search(formula, i, 'left')
-        A = formula[idx:i]
-
-        idx = self.recursive_search(formula, i, 'right')
-        B = formula[i+1:idx+1]
-
-        return A, B
 
     def latex(self):
         ''' Returns the formula in LaTeX-syntax. '''
