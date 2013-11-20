@@ -24,6 +24,7 @@ class Tools(object):
         '''
         # static
         self.MAXIMUM_NESTING_LEVEL = 20
+        self.MAXIMUM_RESOLUTION_SIZE = 50
         self.VERBOSE = False
 
         self.brackets = ['(', ')']
@@ -197,6 +198,68 @@ class Tools(object):
         B = formula[i+1:idx+1]
 
         return A, B
+
+    def resolution(self, formula):
+        '''
+        Applies resolution to a given formula.
+        '''
+        K = formula.clause_set()
+
+        length = 0
+
+        while len(K) != length:
+            length = len(K)
+            if length > self.MAXIMUM_RESOLUTION_SIZE:
+                break
+            #print 'length K:', len(K)
+
+            K = self.resolution_step(K)
+            if [] in K: break
+
+        return K
+
+    def resolution_step(self, K):
+        K_new = []
+        for i in range(len(K)):
+            for j in range(i+1, len(K)):
+                for a in K[i]:
+                    #print 'checking a =', a, ', K[i] = ', K[i], ', K[j] =', K[j]
+                    if self.negated(a) in K[j]:
+                        new_clause = []
+                        new_clause.extend(K[i])
+                        new_clause.extend(K[j])
+                        new_clause.remove(a)
+                        new_clause.remove(self.negated(a))
+                        #print 'length K[i] =', len(K[i])
+                        #print 'length K[j] =', len(K[j])
+                        #print 'New clause:', new_clause
+                        if new_clause not in K:
+                            K_new.append(new_clause)
+                        #try:
+                        #    new_clause = K[i].remove(a) + K[j].remove(self.negated(a))
+                        #    if new_clause not in K:
+                        #        if new_clause == None: K_new.append([])
+                        #        else:
+                        #except TypeError, e:
+                        #    print 'Error: tried to add', K[i], 'and', K[j]
+                        #    pass
+
+        #print 'K =', K
+        #print 'K_new =', K_new
+        #print 'K + K_new =', (K + K_new)
+
+        #if not [] in K + K_new:
+        #    K = list(set(K + K_new))
+
+        return K + K_new
+
+    def negated(self, p):
+        ''' Returns the negated proposition. '''
+
+        if p.startswith(self.NOT):
+            return p.split(self.NOT)[1]
+        else:
+            return self.NOT + p
 
     def recursive_search(self, formula, index, direction):
         '''

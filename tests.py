@@ -558,49 +558,49 @@ class Tests(unittest.TestCase):
     def test_clauses1(self):
         string = u'p0 OR NOT p1 OR (NOT p1 AND p2)'
         formula = Formula(string)
-        self.failUnless(self.tools.equal(formula.clause_set()[0], u'{p₀, ¬p₁, ¬p₁}'))
+        self.failUnless(formula.clause_set()[0], [u'p₀', u'¬p₁', u'¬p₁'])
         self.failUnless(len(formula.clause_set()) == 2)
 
     def test_clauses2(self):
         string = u'p0 OR p1 OR NOT p2 OR (p3 AND p4 AND NOT p5)'
         formula = Formula(string)
-        self.failUnless(self.tools.equal(formula.clause_set()[0], u'{p₀, p₁, ¬p₂, p₃}'))
+        self.failUnless(formula.clause_set()[0], [u'p₀', u'p₁', u'¬p₂', u'p₃'])
         self.failUnless(len(formula.clause_set()) == 3)
 
     def test_clauses3(self):
         string = u'NOT p1 AND (p1 IMPL NOT (p1 AND NOT p2))'
         formula = Formula(string)
-        self.failUnless(self.tools.equal(formula.clause_set()[0], u'{¬p₁}'))
+        self.failUnless(formula.clause_set()[0], [u'¬p₁'])
         self.failUnless(len(formula.clause_set()) == 2)
 
     def test_clauses4(self):
         string = u'(NOT p0 AND TOP) OR (p2 AND NOT p3 AND NOT (p4 OR p5))'
         formula = Formula(string)
-        self.failUnless(self.tools.equal(formula.clause_set()[0], u'{¬p₀, p₂}'))
+        self.failUnless(formula.clause_set()[0], [u'¬p₀', u'p₂'])
         self.failUnless(len(formula.clause_set()) == 8)
 
     def test_clauses5(self):
         string = u'(p0 AND p1) OR (p2 AND p3)'
         formula = Formula(string)
-        self.failUnless(self.tools.equal(formula.clause_set()[0], u'{p₀, p₂}'))
+        self.failUnless(formula.clause_set()[0], [u'p₀', u'p₂'])
         self.failUnless(len(formula.clause_set()) == 4)
 
     def test_clauses6(self):
         string = u'(p0 AND p1) AND (p2 AND (p3 OR (p4 AND p5)))'
         formula = Formula(string)
-        self.failUnless(self.tools.equal(formula.clause_set()[0], u'{p₀}'))
+        self.failUnless(formula.clause_set()[0], [u'p₀'])
         self.failUnless(len(formula.clause_set()) == 5)
 
     def test_clauses7(self):
         string = u'p0 OR p1 OR p2 OR p3 OR p4 OR p5 OR p6 OR p7 OR p8 OR p9 OR p10'
         formula = Formula(string)
-        self.failUnless(self.tools.equal(formula.clause_set()[0], u'{p₀, p₁, p₂, p₃, p₄, p₅, p₆, p₇, p₈, p₉, p₁₀}'))
+        self.failUnless(formula.clause_set()[0], [u'p₀', u'p₁', u'p₂', u'p₃', u'p₄', u'p₅', u'p₆', u'p₇', u'p₈', u'p₉', u'p₁₀'])
         self.failUnless(len(formula.clause_set()) == 1)
 
     def test_clauses8(self):
         string = 'p0 OR (p1 AND p2 AND p3) IMPL (p5 AND (p6 OR p7) AND p8)'
         formula = Formula(string)
-        self.failUnless(self.tools.equal(formula.clause_set()[0], u'{p₀, ¬p₁, ¬p₂, ¬p₃, p₅}'))
+        self.failUnless(formula.clause_set()[0], [u'p₀', u'¬p₁', u'¬p₂', u'¬p₃', u'p₅'])
         self.failUnless(len(formula.clause_set()) == 3)
 
     ### evaluate()
@@ -624,6 +624,32 @@ class Tests(unittest.TestCase):
         string = u'BOTTOM OR BOTTOM OR BOTTOM'
         formula = Formula(string)
         self.failUnless(self.tools.evaluate(formula.formula_nnf) == False)
+
+    ### resolution()
+    def test_resolution1(self):
+        string = u'p0'
+        formula = Formula(string)
+        self.failUnless([] not in self.tools.resolution(formula))
+
+    def test_resolution2(self):
+        string = u'p0 AND NOT p0'
+        formula = Formula(string)
+        self.failUnless([] in self.tools.resolution(formula))
+
+    def test_resolution3(self):
+        string = u'p0 AND (NOT p0 OR p1)'
+        formula = Formula(string)
+        self.failUnless([] not in self.tools.resolution(formula))
+
+    def test_resolution4(self):
+        string = u'(NOT p0 AND (NOT p1 OR p2)) OR (p0 AND NOT (p1 AND NOT p0))'
+        formula = Formula(string)
+        self.failUnless([] not in self.tools.resolution(formula))
+
+    def test_resolution5(self):
+        string = u'(NOT p0 AND p1) OR (p0 AND NOT (p1 AND NOT p0))'
+        formula = Formula(string)
+        self.failUnless([] not in self.tools.resolution(formula))
 
 if __name__ == "__main__":
     unittest.main()

@@ -276,14 +276,11 @@ class Formula(object):
         clauses = clauses.replace('(', '')
         clauses = clauses.replace(')', '')
         clauses = clauses.replace(' ', '')
-        clauses = clauses.replace(self.tools.OR, ', ')
         clauses = clauses.split(self.tools.AND)
 
         for i in range(len(clauses)):
-            clauses[i] = '{' + clauses[i] + '}'
+            clauses[i] = clauses[i].split(self.tools.OR)
 
-        #print 'formula in CNF:', self.formula_cnf
-        #print 'Clauses:', clauses
         return clauses
 
     def sufo(self):

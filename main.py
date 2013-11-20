@@ -170,6 +170,8 @@ class MyApplication(QtGui.QMainWindow, Ui_MainWindow):
             except ValueError, e:
                return '[Error: meta-variable ' + formula + ' not found]'
 
+            if isinstance(f, basestring):
+                return f
             if f.name == anon: name = f.formula
             else: name = f.name
 
@@ -204,17 +206,34 @@ class MyApplication(QtGui.QMainWindow, Ui_MainWindow):
             # clause_set
             elif function == 'clause_set':
                 clause_set = f.clause_set()
+
+                for i in range(len(clause_set)):
+                    clause_set[i] = ', '.join(clause_set[i])
+
+                for i in range(len(clause_set)):
+                    clause_set[i] = '{' + clause_set[i] + '}'
+
                 return 'Found the following ' + str(len(clause_set)) +' clauses:\n' + '\n'.join(clause_set)
 
             # resolution
             elif function == 'resolution':
-                clause_sets, satisfiable = self.tools.resolution(f)
-                if satisfiable:
-                    summary = 'Empty set not found ==> satisfiable.'
-                else:
+                K = self.tools.resolution(f)
+                if [] in K:
                     summary = 'Found the empty set ==> not satisfiable'
+                else:
+                    summary = 'Empty set not found ==> satisfiable.'
 
-                return 'Found the following ' + str(len(clause_sets)) +' clause sets:\n' + '\n'.join(clause_sets) + summary
+                length = str(len(K))
+
+                for i in range(len(K[:10])):
+                    if K[i] == []: K[i] = '[]'
+                    else: K[i] = ', '.join(K[i])
+
+                if len(K) > 10:
+                    K = K[:10]
+                    K.append('(...)')
+
+                return ('Found the following ' + length +' clause sets:\n' + '\n'.join(K) + '\n\n' + summary)
 
             # evaluate
             elif function == 'evaluate':
