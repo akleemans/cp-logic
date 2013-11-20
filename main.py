@@ -90,7 +90,7 @@ class MyApplication(QtGui.QMainWindow, Ui_MainWindow):
                 D = nnf(NOT C)
                 E = cnf(A) AND NOT nnf(NOT B AND p0)
         '''
-        print '0. Starting with:', text
+        if (self.tools.VERBOSE): print '0. Starting with:', text
         # 1. Check if the statement is an assignment
         assignment_flag = ''
         if text.find('=') != -1:                      # assignment
@@ -100,7 +100,7 @@ class MyApplication(QtGui.QMainWindow, Ui_MainWindow):
             else:
                 raise ValueError
 
-        print '1. After assignment check:', text
+        if (self.tools.VERBOSE): print '1. After assignment check:', text
         # 2. Substitute meta variables with existing formulas
         capitals = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
         text = ' ' + text + ' '
@@ -116,7 +116,7 @@ class MyApplication(QtGui.QMainWindow, Ui_MainWindow):
             else:
                 text_new += text[i]
         text = text_new
-        print '2. Substituted meta variables. Now got:', text
+        if (self.tools.VERBOSE): print '2. Substituted meta variables. Now got:', text
 
         # 3. Resolve form-functions (NNF, CNF, pedantic)
         forms = ['nnf', 'cnf', 'pedantic']
@@ -135,9 +135,11 @@ class MyApplication(QtGui.QMainWindow, Ui_MainWindow):
                         level += 1
 
                 f = self.build_formula(text[pos:pos2], anon)
+                if isinstance(f, basestring):
+                    return f
 
-                print 'In resolving forms. text[pos:pos2] =', text[pos:pos2]
-                print 'f =', f
+                if (self.tools.VERBOSE): print 'In resolving forms. text[pos:pos2] =', text[pos:pos2]
+                if (self.tools.VERBOSE): print 'f =', f
 
                 if form == 'nnf': formula = f.formula_nnf
                 elif form == 'cnf': formula = f.formula_cnf
@@ -146,7 +148,7 @@ class MyApplication(QtGui.QMainWindow, Ui_MainWindow):
                 text_new = text[:pos - len(form) - 1] + formula + text[pos2+1:]
                 text = text_new
 
-        print '3. Resolved form-functions. Now got:', text
+        if (self.tools.VERBOSE): print '3. Resolved form-functions. Now got:', text
 
         # 4. a) If assignment, assign formula to meta-variable
         if assignment_flag != '':                      # assignment
@@ -157,10 +159,10 @@ class MyApplication(QtGui.QMainWindow, Ui_MainWindow):
                 return assignment_flag + ' = ' + f.formula
 
         # 4. b) If function, execute it and show result
-        functions = ['l', 'sufo', 'sat', 'latex', 'clause_set', 'dchains']
+        functions = ['l', 'sufo', 'sat', 'latex', 'clause_set', 'evaluate', 'resolution', 'dchains']
         text = text.strip()
 
-        if text.split('(')[0] in functions:             # function
+        if text.split('(')[0] in functions:
             function = text.split('(')[0]
             formula = text[text.find('(')+1:-1]
             try:
@@ -168,11 +170,12 @@ class MyApplication(QtGui.QMainWindow, Ui_MainWindow):
             except ValueError, e:
                return '[Error: meta-variable ' + formula + ' not found]'
 
+            if f.name == anon: name = f.formula
+            else: name = f.name
+
             # length
             if function == 'l':
-                name = f.name
-                if name == anon: name = f.formula
-                return 'l(' + name + ') = ' + str(f.length())
+                return 'l(' + name + ') = ' + str(self.tools.length(f.formula))
 
             # sat
             elif function == 'sat':
@@ -187,46 +190,35 @@ class MyApplication(QtGui.QMainWindow, Ui_MainWindow):
 
                 if satisfiable[0]: s = 'satisfiable with ' +  ', '.join(x for x in satisfiable[1])
                 else: s = 'not satisfiable'
-                name = f.name
-                if name == anon: name = f.formula
-                #return 'sat(' + name + ') is ' + s
                 return '...is ' + s
 
             # latex
             elif function == 'latex':
-                name = f.name
-                if name == anon: name = f.formula
                 return f.latex()
-
-            # pedantic
-            #elif function == 'pedantic':
-            #    name = f.name
-            #    if name == anon: name = f.formula
-            #    return f.formula_pedantic
-
-            # nnf
-            #elif function == 'nnf':
-            #    name = f.name
-            #    if name == anon: name = f.formula
-            #    return f.formula_nnf
 
             # sufo
             elif function == 'sufo':
-                name = f.name
-                if name == anon: name = f.formula
                 subformulas = f.sufo()
                 return 'Found the following ' + str(len(subformulas)) +' subformulas:\n' + '\n'.join(subformulas)
 
             # clause_set
             elif function == 'clause_set':
-                #try:
-                #    satisfiable = self.tools.sat(f.formula_nnf)
-                #except AttributeError, e:
-                #    return '[Error: formula invalid]'
-                #name = f.name
-                #if name == anon: name = f.formula
                 clause_set = f.clause_set()
                 return 'Found the following ' + str(len(clause_set)) +' clauses:\n' + '\n'.join(clause_set)
+
+            # resolution
+            elif function == 'resolution':
+                clause_sets, satisfiable = self.tools.resolution(f)
+                if satisfiable:
+                    summary = 'Empty set not found ==> satisfiable.'
+                else:
+                    summary = 'Found the empty set ==> not satisfiable'
+
+                return 'Found the following ' + str(len(clause_sets)) +' clause sets:\n' + '\n'.join(clause_sets) + summary
+
+            # evaluate
+            elif function == 'evaluate':
+                return name + ' evaluates to ' + str(self.tools.evaluate(f.formula_nnf))
 
             # dchains
             elif function == 'dchains':

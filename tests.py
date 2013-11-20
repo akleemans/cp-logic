@@ -182,6 +182,11 @@ class Tests(unittest.TestCase):
         formula = Formula(string)
         self.failUnless(isinstance(formula, Formula))
 
+    def test_validFormula3(self):
+        string = 'BOTTOM OR BOTTOM OR BOTTOM'
+        formula = Formula(string)
+        self.failUnless(isinstance(formula, Formula))
+
     def test_formula_name(self):
         string = 'p0'
         formula = Formula(string, 'formula1')
@@ -531,7 +536,6 @@ class Tests(unittest.TestCase):
         index = 6
         formula = Formula(string)
         f = self.tools.to_list(formula.formula)
-        print 'fresult;', ' '.join(self.tools.split(f, index)[0])
         self.failUnless(' '.join(self.tools.split(f, index)[0]) == u'( p₀ ∨ ¬ p₁ )')
         self.failUnless(''.join(self.tools.split(f, index)[1]) == u'p₂')
 
@@ -598,6 +602,28 @@ class Tests(unittest.TestCase):
         formula = Formula(string)
         self.failUnless(self.tools.equal(formula.clause_set()[0], u'{p₀, ¬p₁, ¬p₂, ¬p₃, p₅}'))
         self.failUnless(len(formula.clause_set()) == 3)
+
+    ### evaluate()
+
+    def test_evaluate1(self):
+        string = u'TOP'
+        formula = Formula(string)
+        self.failUnless(self.tools.evaluate(formula.formula_nnf) == True)
+
+    def test_evaluate2(self):
+        string = u'TOP AND (BOTTOM OR BOTTOM)'
+        formula = Formula(string)
+        self.failUnless(self.tools.evaluate(formula.formula_nnf) == False)
+
+    def test_evaluate3(self):
+        string = u'BOTTOM OR (BOTTOM OR (TOP AND (BOTTOM OR TOP)))'
+        formula = Formula(string)
+        self.failUnless(self.tools.evaluate(formula.formula_nnf) == True)
+
+    def test_evaluate4(self):
+        string = u'BOTTOM OR BOTTOM OR BOTTOM'
+        formula = Formula(string)
+        self.failUnless(self.tools.evaluate(formula.formula_nnf) == False)
 
 if __name__ == "__main__":
     unittest.main()

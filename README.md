@@ -124,14 +124,20 @@ and
 
 will result in a different set of subformulas.
 
+If you want to evaluate how a certain formula without propositions evaluates, you can simply enter
+
+    evaluate(⊤ ∧ ( ⊥ ∨ ⊥ ))
+
+which will then be resolved to a single `True` or `False`-Value.
+
 For a representation that you can copy-paste into LaTeX, use the `latex`-command:
 
     latex(C)
 
 TODO:
 
-    dchains()
     resolution()
+    dchains()
 
 Functions are nestable to the first degree.
 If a function is specified with a certain form (cnf, nnf, pedantic) it will be resolved first before the function is applied.
@@ -148,7 +154,7 @@ If a function is specified with a certain form (cnf, nnf, pedantic) it will be r
 
 ## Documentation
 
-### Funtions
+### Available Functions
 
 | function       | meaning                                                                      |
 |:---------------|:-----------------------------------------------------------------------------|
@@ -160,14 +166,14 @@ If a function is specified with a certain form (cnf, nnf, pedantic) it will be r
 | `cnf()`        | Returns a formula in conjunctive normal form                                 |
 | `sat()`        | Returns, if possible, a valid valuation for the given formula                |
 | `clause_set()` | Calculates the corresponding clause set for a given formula                  |
-| `dchains()`    | Use D-chains to prove formula                                                |
+| `evaluate()`   | Evaluate a formula (without propositions)                                    |
 | `resolution()` | Apply resolution                                                             |
-
+| `dchains()`    | Use D-chains to prove formula                                                |
 
 ### UML
 ![](https://raw.github.com/captainfox/cp-logic/master/UML.png?token=1068130__eyJzY29wZSI6IlJhd0Jsb2I6Y2FwdGFpbmZveC9jcC1sb2dpYy9tYXN0ZXIvVU1MLnBuZyIsImV4cGlyZXMiOjEzODU0NzUxMTF9--914294d347bdaac58dc64b5255b22c870256721d)
 
 ### Tests
-To start the tests, enter
+To run the tests provided, enter
 
     python tests.py

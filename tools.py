@@ -136,12 +136,21 @@ class Tools(object):
 
         return [False, []]
 
+    def evaluate(self, formula_nnf):
+        formula = self.to_list(formula_nnf)
+
+         # replace TOP and BOTTOM with t and f
+        for i in range(len(formula)):
+            if formula[i] == self.TOP: formula[i] = 't'
+            if formula[i] == self.BOTTOM: formula[i] = 'f'
+
+        return self.resolve(formula)
+
     def resolve(self, l):
         '''
         Resolves a formula with no propositions to a single value (true or false).
-        Used by sat().
+        For internal use only, for example by sat() or evaluate().
         '''
-
         while len(l) > 1:
             for i in range(len(l)):
                 # resolve AND, OR
@@ -190,19 +199,22 @@ class Tools(object):
         return A, B
 
     def recursive_search(self, formula, index, direction):
-        ''' Returns the position of the part which lies on the same level in the formula. '''
+        '''
+        Returns the position of the last part which lies on the same level in the formula.
+        The search accepts 'left' or 'right' as direction and will stop if the beginning or end is reached.
+        '''
 
-        if direction == 'left':
-            d = -1
-        elif direction == 'right':
-            d = 1
-        else:
-            raise ValueError
+        if direction == 'left': d = -1
+        elif direction == 'right': d = 1
+        else: raise ValueError
 
         pos = index + d
-
         local_level = 0
+
         while True:
+            if pos == -1: return 0
+            if pos == len(formula): return pos-1
+
             if formula[pos] == ')':
                 local_level -= 1
             elif formula[pos] == '(':
@@ -216,6 +228,7 @@ class Tools(object):
                     return pos-1
                 else:
                     return pos
+
             pos += d
 
     def equal(self, f1, f2):
