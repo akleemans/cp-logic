@@ -172,6 +172,10 @@ class Tools(object):
 
     def split(self, formula, i):
         ''' Returns the two neighbours of a conjunction. '''
+        #print 'Formula looks like:', formula
+        #print 'Position to split:', i
+        #print 'Token to split:', formula[i]
+
         if formula[i] not in self.conjunctions:
             print 'got "' + formula[i] + '" instead'
             raise UnexpectedTokenError('can only find neighbours of conjunctions.')

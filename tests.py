@@ -487,16 +487,67 @@ class Tests(unittest.TestCase):
     ### equals()
 
     def test_equals1(self):
-        f1 = Formula('(NOT p0 AND TOP) OR (p2 AND NOT p3 AND NOT (p4 OR p5))')
+        f1 = Formula(u'    p0  ')
+        f2 = Formula(u'p0')
+        self.failUnless(self.tools.equal(f1.formula_pedantic, f2.formula_pedantic))
+
+    def test_equals2(self):
+        f1 = Formula(u'( ( ((( NOT p0 )   ))))')
+        f2 = Formula(u'¬p₀')
+        self.failUnless(self.tools.equal(f1.formula_pedantic, f2.formula_pedantic))
+
+    def test_equals3(self):
+        f1 = Formula(u'(NOT p0 AND TOP) OR (p2 AND NOT p3 AND NOT (p4 OR p5))')
         f2 = Formula(u'(¬p₀ ∧ ⊤) ∨ (p₂ ∧ ¬p₃ ∧ ¬(p₄ ∨ p₅))')
+        self.failUnless(self.tools.equal(f1.formula_cnf, f2.formula_cnf))
+
+    def test_equals4(self):
+        f1 = Formula(u'NOT p0 IMPL p1')
+        f2 = Formula(u'¬ p₀ → p₁')
+        self.failUnless(self.tools.equal(f1.formula_pedantic, f2.formula_pedantic))
+
+    def test_equals5(self):
+        f1 = Formula(u'NOT ((p0 AND p1) OR (p2 OR p3))')
+        f2 = Formula(u'¬ ( ( p₀ ∧ p₁ ) ∨ ( p₂ ∨ p₃ ) )')
+        self.failUnless(self.tools.equal(f1.formula_pedantic, f2.formula_pedantic))
+
+    def test_equals6(self):
+        f1 = Formula(u'p0 AND NOT (NOT p1 OR p2)')
+        f2 = Formula(u'p₀ ∧ ( p₁ ∧ ¬ p₂ )')
         self.failUnless(self.tools.equal(f1.formula_cnf, f2.formula_cnf))
 
     ### split()
 
     def test_split1(self):
-        string = u'(¬p₀ ∧ (p₀ ∨ ¬p₀))'
+        string = u'( p₀ ∨ ¬p₁ ) ∨ p₂'
+        index = 2
         formula = Formula(string)
-        self.failUnless(self.tools.equal(self.tools.split(formula.formula, 7)[1], u'(p₀ ∨ ¬p₀)'))
+        f = self.tools.to_list(formula.formula)
+        self.failUnless(''.join(self.tools.split(f, index)[0]) == u'p₀')
+        self.failUnless(''.join(self.tools.split(f, index)[1]) == u'¬p₁')
+
+    def test_split2(self):
+        string = u'( p₀ ∨ ¬p₁ ) ∨ p₂'
+        index = 6
+        formula = Formula(string)
+        f = self.tools.to_list(formula.formula)
+        print 'fresult;', ' '.join(self.tools.split(f, index)[0])
+        self.failUnless(' '.join(self.tools.split(f, index)[0]) == u'( p₀ ∨ ¬ p₁ )')
+        self.failUnless(''.join(self.tools.split(f, index)[1]) == u'p₂')
+
+    def test_split3(self):
+        string = u'(¬p₀ ∧ (p₀ ∨ ¬p₀))'
+        index = 7
+        formula = Formula(string)
+        self.failUnless(self.tools.equal(self.tools.split(formula.formula, index)[1], u'(p₀ ∨ ¬p₀)'))
+
+    def test_split4(self):
+        string = u'p₀ ∨ ( p₂ ∧ ( p₃ ∧ ( p₄ ∧ p₅ ) ) )'
+        index = 3
+        formula = Formula(string)
+        self.failUnless(self.tools.equal(self.tools.split(formula.formula, index)[0], u'p₀'))
+        self.failUnless(self.tools.equal(self.tools.split(formula.formula, index)[1], u'( p₂ ∧ ( p₃ ∧ ( p₄ ∧ p₅ ) ) )'))
+
 
     ### clause_set()
 
@@ -523,6 +574,30 @@ class Tests(unittest.TestCase):
         formula = Formula(string)
         self.failUnless(self.tools.equal(formula.clause_set()[0], u'{¬p₀, p₂}'))
         self.failUnless(len(formula.clause_set()) == 8)
+
+    def test_clauses5(self):
+        string = u'(p0 AND p1) OR (p2 AND p3)'
+        formula = Formula(string)
+        self.failUnless(self.tools.equal(formula.clause_set()[0], u'{p₀, p₂}'))
+        self.failUnless(len(formula.clause_set()) == 4)
+
+    def test_clauses6(self):
+        string = u'(p0 AND p1) AND (p2 AND (p3 OR (p4 AND p5)))'
+        formula = Formula(string)
+        self.failUnless(self.tools.equal(formula.clause_set()[0], u'{p₀}'))
+        self.failUnless(len(formula.clause_set()) == 5)
+
+    def test_clauses7(self):
+        string = u'p0 OR p1 OR p2 OR p3 OR p4 OR p5 OR p6 OR p7 OR p8 OR p9 OR p10'
+        formula = Formula(string)
+        self.failUnless(self.tools.equal(formula.clause_set()[0], u'{p₀, p₁, p₂, p₃, p₄, p₅, p₆, p₇, p₈, p₉, p₁₀}'))
+        self.failUnless(len(formula.clause_set()) == 1)
+
+    def test_clauses8(self):
+        string = 'p0 OR (p1 AND p2 AND p3) IMPL (p5 AND (p6 OR p7) AND p8)'
+        formula = Formula(string)
+        self.failUnless(self.tools.equal(formula.clause_set()[0], u'{p₀, ¬p₁, ¬p₂, ¬p₃, p₅}'))
+        self.failUnless(len(formula.clause_set()) == 3)
 
 if __name__ == "__main__":
     unittest.main()
