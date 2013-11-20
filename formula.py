@@ -522,22 +522,3 @@ class Formula(object):
             formula = formula.replace(a, b)
 
         return formula
-
-### exceptions ###
-
-class FormulaInvalidError(Exception):
-    def __init__(self, arg):
-        self.value = arg
-
-class TimeOutError(Exception):
-    def __init__(self, arg):
-        self.value = arg
-
-class MaximalNestingSizeError(Exception):
-    def __init__(self, arg):
-        self.value = arg
-
-class UnexpectedTokenError(Exception):
-    def __init__(self, arg):
-        self.value = arg
-

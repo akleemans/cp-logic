@@ -159,7 +159,7 @@ class MyApplication(QtGui.QMainWindow, Ui_MainWindow):
                 return assignment_flag + ' = ' + f.formula
 
         # 4. b) If function, execute it and show result
-        functions = ['l', 'sufo', 'sat', 'latex', 'clause_set', 'evaluate', 'resolution', 'dchains']
+        functions = ['length', 'sufo', 'sat', 'latex', 'clause_set', 'evaluate', 'resolution', 'dchains']
         text = text.strip()
 
         if text.split('(')[0] in functions:
@@ -176,8 +176,8 @@ class MyApplication(QtGui.QMainWindow, Ui_MainWindow):
             else: name = f.name
 
             # length
-            if function == 'l':
-                return 'l(' + name + ') = ' + str(self.tools.length(f.formula))
+            if function == 'length':
+                return 'length(' + name + ') = ' + str(self.tools.length(f.formula))
 
             # sat
             elif function == 'sat':

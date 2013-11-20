@@ -296,3 +296,21 @@ class Tools(object):
 
     def equal(self, f1, f2):
         return f1.replace(' ', '') == f2.replace(' ', '')
+
+### exceptions ###
+
+class FormulaInvalidError(Exception):
+    def __init__(self, arg):
+        self.value = arg
+
+class TimeOutError(Exception):
+    def __init__(self, arg):
+        self.value = arg
+
+class MaximalNestingSizeError(Exception):
+    def __init__(self, arg):
+        self.value = arg
+
+class UnexpectedTokenError(Exception):
+    def __init__(self, arg):
+        self.value = arg

@@ -104,7 +104,7 @@ For the clause set (which will be obtained through CNF) enter
 which will provide the corresponding set in set notation.
 For the length, enter
 
-    l(A)
+    length(A)
 
 and the elements of the formula will be counted and shown as an integer.
 
@@ -142,7 +142,7 @@ TODO:
 Functions are nestable to the first degree.
 If a function is specified with a certain form (cnf, nnf, pedantic) it will be resolved first before the function is applied.
 
-    l(nnf(A))
+    length(nnf(A))
     sufo(cnf(A))
     latex(pedantic(A))
 
@@ -158,7 +158,7 @@ If a function is specified with a certain form (cnf, nnf, pedantic) it will be r
 
 | function       | meaning                                                                      |
 |:---------------|:-----------------------------------------------------------------------------|
-| `l()`          | Returns the length of a given formula                                        |
+| `length()`     | Returns the length of a given formula                                        |
 | `sufo()`       | Returns all subformulas from a given formula                                 |
 | `latex()`      | Returns a latex representation of a given formula                            |
 | `pedantic()`   | Returns a pedantic (binary) representation of a given formula                |
