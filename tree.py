@@ -26,7 +26,7 @@ GRAY = (192, 192, 192)
 
 class Tree(object):
     '''
-    Represents a node.
+    Represents a Tree structure .
     '''
 
     def __init__(self, start_node):
@@ -82,7 +82,6 @@ class Tree(object):
         pygame.display.set_caption("dchains-tree")
 
         while not self.catch_event():
-            self.update_board()
             self.draw_board()
             time.sleep(0.1)
 
@@ -169,9 +168,3 @@ class Tree(object):
 
     def distance(self, pos1, pos2):
         return math.sqrt((pos1[0]-pos2[0])**2 + (pos1[1]-pos2[1])**2)
-
-    def update_board(self):
-        pass
-
-#if __name__ == '__main__':
-#    Main()

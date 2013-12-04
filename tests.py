@@ -626,6 +626,7 @@ class Tests(unittest.TestCase):
         self.failUnless(self.tools.evaluate(formula.formula_nnf) == False)
 
     ### resolution()
+
     def test_resolution1(self):
         string = u'p0'
         formula = Formula(string)
@@ -650,6 +651,38 @@ class Tests(unittest.TestCase):
         string = u'(NOT p0 AND p1) OR (p0 AND NOT (p1 AND NOT p0))'
         formula = Formula(string)
         self.failUnless([] not in self.tools.resolution(formula))
+
+    ### dchains()
+
+    def test_dchains1(self):
+        formula_list = ['p0', 'TOP OR BOTTOM']
+        is_axiom = self.tools.dchains(formula_list, True)
+        self.failUnless(is_axiom)
+
+    def test_dchains2(self):
+        formula_list = ['p2 OR BOTTOM']
+        is_axiom = self.tools.dchains(formula_list, True)
+        self.failUnless(not is_axiom)
+
+    def test_dchains3(self):
+        formula_list = ['p0 AND NOT p1', 'p0 OR TOP']
+        is_axiom = self.tools.dchains(formula_list, True)
+        self.failUnless(is_axiom)
+
+    def test_dchains4(self):
+        formula_list = ['p0 OR p1', 'NOT p1 AND p2']
+        is_axiom = self.tools.dchains(formula_list, True)
+        self.failUnless(not is_axiom)
+
+    def test_dchains5(self):
+        formula_list = ['BOTTOM OR TOP', 'p2 AND p3', 'p1 AND (p2 OR p4)']
+        is_axiom = self.tools.dchains(formula_list, True)
+        self.failUnless(is_axiom)
+
+    def test_dchains6(self):
+        formula_list = ['BOTTOM OR TOP', 'p2 AND (NOT p2 OR p3)', 'p1 AND (p2 OR p4)']
+        is_axiom = self.tools.dchains(formula_list, True)
+        self.failUnless(is_axiom)
 
 if __name__ == "__main__":
     unittest.main()

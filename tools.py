@@ -270,7 +270,7 @@ class Tools(object):
         else:
             return self.NOT + p
 
-    def dchains(self, formula_list):
+    def dchains(self, formula_list, testing=False):
         '''
         Applies the 'deduction chains'-algorithm to a set of formulas.
         Out of a initial sequence G, rules are applied to obtain either a
@@ -293,7 +293,8 @@ class Tools(object):
         is_axiom = parent.traverse_tree()
 
         # 3. draw tree
-        t = tree.Tree(parent)
+        if not testing:
+            t = tree.Tree(parent)
         #t.show()
 
         return is_axiom

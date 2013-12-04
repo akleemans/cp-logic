@@ -239,9 +239,10 @@ class GUI(QtGui.QMainWindow, Ui_MainWindow):
 
             # dchains
             elif function == 'dchains':
-                formula_list = []
-                for f in formula.split(','):
-                    formula_list.append(f)
+                #formula_list = []
+                #for f in formula.split(','):
+                #    formula_list.append(f)
+                formula_list = formula.split(',')
 
                 is_axiom = self.tools.dchains(formula_list)
                 if is_axiom:
