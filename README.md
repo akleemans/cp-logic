@@ -32,7 +32,7 @@ If you're using multiple versions of Python, you may specify the version by ente
     python2.7 main.py
 
 You should then see a window open like this (depending on your operating system):
-![](https://raw.github.com/captainfox/cp-logic/master/toolbox.png?login=captainfox&token=7ebb4cd1faeb4ee5c28e1fe7605bbbbd)
+![](../master/toolbox.png?raw=true)
 
 You can now enter one of the examples or test
 
@@ -161,9 +161,7 @@ For building up series of deduction chains, short dchains, you can use the comma
 
 where A, B and C are metavariables or formulas, entered directly. The system will provide a graphical output similar to this one:
 
-![1](../blob/master/tree.png?raw=true)
-![2](../master/tree.png?raw=true)
-![3](https://raw.github.com/captainfox/cp-logic/master/tree.png)
+![](../master/tree.png?raw=true)
 
 Click on a node for more information, which chain exactly the node is representing.
 
@@ -201,7 +199,7 @@ If a function is specified with a certain form (cnf, nnf, pedantic) it will be r
 | `dchains()`    | Use D-chains to prove formula                                                |
 
 ### UML
-![](https://raw.github.com/captainfox/cp-logic/master/UML.png)
+![](../master/UML.png?raw=true)
 
 ### Tests
 To run the tests provided, enter
