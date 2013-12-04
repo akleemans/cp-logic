@@ -6,6 +6,7 @@ Some tools for classical propositional logic - my bachelor thesis.
 ## Prerequisites
 * Python 2.7
 * [Pyside](http://qt-project.org/wiki/PySideDownloads), the QT library for Python
+* [Pygame](http://www.pygame.org/download.shtml)
 
 Note: For Ubuntu, simply enter
 
@@ -13,7 +14,11 @@ Note: For Ubuntu, simply enter
     sudo apt-get update
     sudo apt-get install python-pyside
 
-to install Pyside.
+to install Pyside and
+
+    sudo apt-get install python-pygame
+
+to install Pygame.
 For other OS see the link above (binary libraries for Windows, MAC and Linux are provided).
 
 ## Getting started

@@ -9,13 +9,16 @@ Tools-class for use with formulas.
 import re
 import locale
 import time
-from formula import *
+import formula
+import node
 
 locale.setlocale(locale.LC_ALL, '')
 
 class Tools(object):
     '''
-    Some static tools as an addition for the formula-class.
+    Static tools as an addition for the formula-class.
+    All algorithms not directly associated with the formula itself are part of this class.
+    Also holds the constants for nesting level and verbosity.
     '''
 
     def __init__(self):
@@ -92,7 +95,7 @@ class Tools(object):
         propositions.sort()
 
         high = 2**len(propositions)
-        print 'Found', len(propositions), 'distinct propositions =>', high, 'possibilities'
+        if (self.VERBOSE): print 'Found', len(propositions), 'distinct propositions =>', high, 'possibilities'
 
         # replace TOP and BOTTOM with t and f
         for i in range(len(parts)):
@@ -138,6 +141,10 @@ class Tools(object):
         return [False, []]
 
     def evaluate(self, formula_nnf):
+        '''
+        Wrapper around resolve(), built for user input.
+        Will be called from the main class.
+        '''
         formula = self.to_list(formula_nnf)
 
          # replace TOP and BOTTOM with t and f
@@ -260,6 +267,30 @@ class Tools(object):
             return p.split(self.NOT)[1]
         else:
             return self.NOT + p
+
+    def dchains(self, formula_list):
+        '''
+        Applies the 'deduction chains'-algorithm to a set of formulas.
+        Out of a initial sequence G, rules are applied to obtain either a
+        irreducible sequence or an axiom of PSC.
+        '''
+        #print 'Got', len(formula_list), 'formulas.'
+        #print 'Formulas:', formula_list
+
+        # 1. calculating initial Gamma = Gamma0
+        G = ''
+        print 'Got', len(formula_list), 'formulas.'
+
+        for f in formula_list:
+            f1 = formula.Formula(f, '_anon')
+            G = G + f1.formula_nnf.replace(' ', '') + ','
+        G = G[:-1]
+
+        # 2. build up tree by apply rules
+        parent = node.Node(G, '0')
+        is_axiom = parent.traverse_tree()
+
+        return is_axiom
 
     def recursive_search(self, formula, index, direction):
         '''

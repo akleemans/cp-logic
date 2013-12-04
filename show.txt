@@ -1,8 +1,0 @@
-p0 OR (p1 AND p2 AND (NOT p2 IMPL p1)) -> pedantic
-
-
-NOT (NOT (p1 OR NOT p2 OR (NOT p1 AND (NOT p1 AND p2))) AND p0)
-pedantic(NOT (NOT (p1 OR NOT p2 OR (NOT p1 AND (NOT p1 AND p2))) AND p0))
-nnf(NOT (NOT (p1 OR NOT p2 OR (NOT p1 AND (NOT p1 AND p2))) AND p0))
-sat(¬ ( ¬ ( p₁ ∨ ¬ p₂ ∨ ( ¬ p₁ ∧ ( ¬ p₁ ∧ p₂ ) ) ) ∧ p₀ ))
-sat(( ( p₁ ∨ ¬ p₂ ) ∨ ( ¬ p₁ ∧ ( ¬ p₁ ∧ p₂ ) ) ) ∨ ¬ p₀)

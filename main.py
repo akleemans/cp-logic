@@ -22,13 +22,8 @@ class MyApplication(QtGui.QMainWindow, Ui_MainWindow):
 
         self.setupUi(self)
         self.count = 0
-        #self.listWidget.addItem(u'\u0393\u2080: p\u2080 ∧ p\u2081 ∧ (¬ p\u2082 ∨ ⊥)\n\u0393\u2081: p\u2080 ∧ p\u2081 , ¬ p\u2082 ∨ ⊥\n\u0393\u2082: ...')
         self.listWidget.addItem('Welcome to cp-logic! Try entering something like this (double-click on entry):')
         self.listWidget.addItem('p0 AND (NOT p1 OR p2)')
-        #self.listWidget.addItem('A = p0 OR p1 IMPL p2 AND p0')
-        #self.listWidget.addItem('l(A)')
-        #self.listWidget.addItem('B = (NOT p0 AND p1) AND (p0 OR p2) OR (NOT p2 AND p3)')
-        #self.listWidget.addItem('sat(B)')
         self.listWidget.addItem('----------------------------------------------------------------------------------')
         self.formulas = []
 
@@ -101,6 +96,7 @@ class MyApplication(QtGui.QMainWindow, Ui_MainWindow):
                 raise ValueError
 
         if (self.tools.VERBOSE): print '1. After assignment check:', text
+
         # 2. Substitute meta variables with existing formulas
         capitals = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
         text = ' ' + text + ' '
@@ -165,15 +161,17 @@ class MyApplication(QtGui.QMainWindow, Ui_MainWindow):
         if text.split('(')[0] in functions:
             function = text.split('(')[0]
             formula = text[text.find('(')+1:-1]
-            try:
-                f = self.build_formula(formula, anon)
-            except ValueError, e:
-               return '[Error: meta-variable ' + formula + ' not found]'
 
-            if isinstance(f, basestring):
-                return f
-            if f.name == anon: name = f.formula
-            else: name = f.name
+            if function != 'dchains':
+                try:
+                    f = self.build_formula(formula, anon)
+                except ValueError, e:
+                   return '[Error: meta-variable ' + formula + ' not found]'
+
+                if isinstance(f, basestring):
+                    return f
+                if f.name == anon: name = f.formula
+                else: name = f.name
 
             # length
             if function == 'length':
@@ -241,9 +239,17 @@ class MyApplication(QtGui.QMainWindow, Ui_MainWindow):
 
             # dchains
             elif function == 'dchains':
-                name = f.name
-                if name == anon: name = f.formula
-                return f.formula_nnf
+                formula_list = []
+                for f in formula.split(','):
+                    formula_list.append(f)
+
+                is_axiom = self.tools.dchains(formula_list)
+                if is_axiom:
+                    summary = 'Chain is valid in PSC.'
+                else:
+                    summary = 'Not a valid chain in PSC.'
+
+                return summary
 
             # ...
 
