@@ -18,15 +18,24 @@ class Node(object):
     Each node has 0-2 children, depending on its chain.
     '''
 
-    def __init__(self, chain, name):
+    def __init__(self, chain, name, parent=None):
         ''' Constructor '''
-        print 'Jippie, I was born :D with name =', name, ' and chain =', chain
+        #print 'Jippie, I was born :D with name =', name, ' and chain =', chain
         self.tools = tools.Tools()
 
         self.name = name
         self.chain = chain
+        self.parent = parent
         self.children = []
         self.axiom = 'undef' # undef, no, id, true
+        self.status = ''
+
+    def set_position(self, x, y):
+        self.x = x
+        self.y = y
+
+    def set_status(self, status):
+        self.status = status
 
     def traverse_tree(self):
         '''
@@ -54,9 +63,6 @@ class Node(object):
         '''
         self.children = []
 
-        # TODO: rewrite linear behaviour to linear in terms of formula.
-        # then, inside the current formula, go top-down, dig down from level 0 to 1, 2, 3...
-
         for i in range(len(self.chain.split(','))-1, -1, -1):
             part = self.chain.split(',')[i]
             #print 'searching part =', part
@@ -80,7 +86,7 @@ class Node(object):
                 if last_part != '': last_part = ',' + last_part
 
                 if part[pos] == self.tools.OR:
-                    self.children.append(Node(first_part + part[:pos] + ',' + part[pos+1:] + last_part, self.name + '0'))
+                    self.children.append(Node(first_part + part[:pos] + ',' + part[pos+1:] + last_part, self.name + '0', self))
                     break
 
                 elif part[pos] == self.tools.AND:
@@ -96,8 +102,8 @@ class Node(object):
 
                     chain1 = first_part + part[:pos] + last_part
                     chain2 = first_part + part[pos+1:] + last_part
-                    self.children.append(Node(chain1, self.name + '0'))
-                    self.children.append(Node(chain2, self.name + '1'))
+                    self.children.append(Node(chain1, self.name + '0', self))
+                    self.children.append(Node(chain2, self.name + '1', self))
                     break
 
                 if len(self.children) > 0:

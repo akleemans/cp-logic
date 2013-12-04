@@ -14,9 +14,9 @@ from gui import *
 from formula import *
 from tools import *
 
-class MyApplication(QtGui.QMainWindow, Ui_MainWindow):
+class GUI(QtGui.QMainWindow, Ui_MainWindow):
     def __init__(self, parent=None):
-        super(MyApplication, self).__init__(parent)
+        super(GUI, self).__init__(parent)
 
         self.tools = Tools()
 
@@ -301,6 +301,6 @@ class MyApplication(QtGui.QMainWindow, Ui_MainWindow):
 
 if __name__ == "__main__":
     app = QtGui.QApplication(sys.argv)
-    window = MyApplication()
+    window = GUI()
     window.show()
     sys.exit(app.exec_())

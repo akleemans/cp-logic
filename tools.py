@@ -9,8 +9,10 @@ Tools-class for use with formulas.
 import re
 import locale
 import time
+
 import formula
 import node
+import tree
 
 locale.setlocale(locale.LC_ALL, '')
 
@@ -279,7 +281,7 @@ class Tools(object):
 
         # 1. calculating initial Gamma = Gamma0
         G = ''
-        print 'Got', len(formula_list), 'formulas.'
+        #print 'Got', len(formula_list), 'formulas.'
 
         for f in formula_list:
             f1 = formula.Formula(f, '_anon')
@@ -289,6 +291,10 @@ class Tools(object):
         # 2. build up tree by apply rules
         parent = node.Node(G, '0')
         is_axiom = parent.traverse_tree()
+
+        # 3. draw tree
+        t = tree.Tree(parent)
+        #t.show()
 
         return is_axiom
 
