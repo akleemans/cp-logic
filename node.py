@@ -20,7 +20,6 @@ class Node(object):
 
     def __init__(self, chain, name, parent=None):
         ''' Constructor '''
-        #print 'Jippie, I was born :D with name =', name, ' and chain =', chain
         self.tools = tools.Tools()
 
         self.name = name
@@ -31,10 +30,16 @@ class Node(object):
         self.status = ''
 
     def set_position(self, x, y):
+        '''
+        Sets the position of the node on the graph.
+        '''
         self.x = x
         self.y = y
 
     def set_status(self, status):
+        '''
+        Sets the status (e.g. if the user clicked on it).
+        '''
         self.status = status
 
     def traverse_tree(self):
@@ -90,16 +95,6 @@ class Node(object):
                     break
 
                 elif part[pos] == self.tools.AND:
-                    # find left part
-                    #left = i-1
-                    #while left > 0 and self.chain[left] != ',':
-                    #    left -= 1
-
-                    # find right part
-                    #right = i+1
-                    #while right < len(self.chain) and self.chain[right] != ',':
-                    #    right += 1
-
                     chain1 = first_part + part[:pos] + last_part
                     chain2 = first_part + part[pos+1:] + last_part
                     self.children.append(Node(chain1, self.name + '0', self))

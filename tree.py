@@ -26,10 +26,13 @@ GRAY = (192, 192, 192)
 
 class Tree(object):
     '''
-    Represents a Tree structure .
+    Represents a tree structure for deduction chains.
     '''
 
     def __init__(self, start_node):
+        '''
+        Constructor
+        '''
         self.start_node = start_node
         self.size = (1600, 900)
         self.nodes = []
@@ -55,28 +58,10 @@ class Tree(object):
                 x_step = (self.size[0]/(2**(len(node.name)-1))) / 2
                 if node.name[-1] == '0': x -= x_step
                 elif node.name[-1]  == '1': x += x_step
-                #local_depth = 0
-                #for token in node.name:
-                #   x_step = self.size[0]/(2**local_depth+1)
-                #   if token == '0': x -= x_step
-                #   elif token == '1': x += x_step
-                #   local_depth += 1
+
             node.set_position(x, y)
 
-        #for i in range(depth):
-        #    y += y_step
-        #    x_step =  self.size[0]/(2**i+1)
-        #    x = 0
-        #    for j in range(2**i):
-        #        x += x_step
-                #self.shapes.append(shape.Shape(x, y, u'Γ', str(x)+'/'+str(y)))
-
-        #values = ['undef', 'no', 'id', 'true']
-        #for s in self.shapes:
-        #    s.is_axiom = values[random.randint(0, 3)]
-
         # preparing canvas
-
         pygame.init()
         self.disp = pygame.display.set_mode([self.size[0], self.size[1]])
         pygame.display.set_caption("dchains-tree")
@@ -86,6 +71,9 @@ class Tree(object):
             time.sleep(0.1)
 
     def get_nodes(self):
+        '''
+        Traverse tree and collect all nodes into a linear list, 'nodes'.
+        '''
         nodes = []
         temp = [self.start_node]
 
@@ -98,6 +86,10 @@ class Tree(object):
 
 
     def get_depth(self):
+        '''
+        Get the maximum depth of the tree.
+        Used to calculate how to place the nodes.
+        '''
         depth = 0
         nodes = []
         nodes.append(self.start_node)
@@ -107,10 +99,12 @@ class Tree(object):
             nodes.extend(nodes[0].children)
             del nodes[0]
 
-        #print 'Found maximum depth:', depth
         return depth
 
     def draw_board(self):
+        '''
+        Starts up a pygame-canvas and draws the graph.
+        '''
         pygame.draw.rect(self.disp, (254, 254, 254), (0, 0, self.size[0], self.size[1]))
         small_font = pygame.font.SysFont(u'dejavuserif', 14)
         normal_font = pygame.font.SysFont(u'monospace', 16)
@@ -153,6 +147,10 @@ class Tree(object):
         pygame.display.flip()
 
     def catch_event(self):
+        '''
+        Catches events like mouse clicks or buttons.
+        Currently only clicking is supported.
+        '''
         for event in pygame.event.get():
             if event.type == pygame.MOUSEBUTTONUP:
                 self.handle_click(pygame.mouse.get_pos())
@@ -161,10 +159,16 @@ class Tree(object):
                 return True
 
     def handle_click(self, pos):
+        '''
+        Checks on which node the user clicked.
+        '''
         for s in self.nodes:
             s.set_status('')
             if self.distance(pos, (s.x, s.y)) < 20:
                 s.set_status('marked')
 
     def distance(self, pos1, pos2):
+        '''
+        Calculate distance between two points on the graph.
+        '''
         return math.sqrt((pos1[0]-pos2[0])**2 + (pos1[1]-pos2[1])**2)

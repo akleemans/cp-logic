@@ -191,15 +191,11 @@ class Tools(object):
 
     def split(self, formula, i):
         ''' Returns the two neighbours of a conjunction. '''
-        #print 'Formula looks like:', formula
-        #print 'Position to split:', i
-        #print 'Token to split:', formula[i]
 
         if formula[i] not in self.conjunctions:
             print 'got "' + formula[i] + '" instead'
             raise UnexpectedTokenError('can only find neighbours of conjunctions.')
 
-        #print 'Searching with i =', i, 'formula =', formula
         idx = self.recursive_search(formula, i, 'left')
         A = formula[idx:i]
 
@@ -276,12 +272,9 @@ class Tools(object):
         Out of a initial sequence G, rules are applied to obtain either a
         irreducible sequence or an axiom of PSC.
         '''
-        #print 'Got', len(formula_list), 'formulas.'
-        #print 'Formulas:', formula_list
 
         # 1. calculating initial Gamma = Gamma0
         G = ''
-        #print 'Got', len(formula_list), 'formulas.'
 
         for f in formula_list:
             f1 = formula.Formula(f, '_anon')
@@ -295,7 +288,6 @@ class Tools(object):
         # 3. draw tree
         if not testing:
             t = tree.Tree(parent)
-        #t.show()
 
         return is_axiom
 

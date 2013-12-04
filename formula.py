@@ -145,8 +145,6 @@ class Formula(object):
             current_level = 0
             for i in range(len(formula)):
                 if formula[i] == ')' and current_level == target_level or i == len(formula) - 1: # and current_level == 1:
-                   # print "in the correct level. conj = ", conj
-
                     # check for invalid formulas.
                     a = self.tools.AND + self.tools.OR
                     b = self.tools.OR + self.tools.AND
@@ -165,8 +163,6 @@ class Formula(object):
                         else:
                             pos_groups.append(positions)
 
-                        #print 'pos_groups:', pos_groups
-
                         if len(pos_groups) == 1:
                             max_brackets = 2
                         elif len(pos_groups) == 2:
@@ -175,14 +171,11 @@ class Formula(object):
                         for positions in pos_groups:
                             # set brackets recursively until list has only 1 conjunction left
                             while len(positions) >= max_brackets:
-                                #print "setting brackets for positions =", positions
                                 pos = self.tools.recursive_search(formula, positions[0], 'left')
                                 formula.insert(pos, '(')
 
                                 pos = self.tools.recursive_search(formula, positions[0]+1, 'right')
                                 formula.insert(pos+1, ')')
-
-                                #conj.pop(0)
                                 positions.pop(0)
 
                                 for pos in pos_groups:
@@ -212,8 +205,6 @@ class Formula(object):
             conj = []
             positions = []
 
-        # removing brackets
-        #print 'Formula before brackets:', ' '.join(formula)
         found_removable = True
 
         while found_removable:
@@ -228,9 +219,6 @@ class Formula(object):
                     brackets.append(str(i) + ':' + str(current_level) + str(current_level - 1))
                     current_level -= 1
 
-            #print 'formula:', ' '.join(formula)
-            #print 'brackets:', brackets
-
             # remove multiple brackets
             for i in range(len(brackets)):
                 if i < len(brackets)-1: # not operating on last element
@@ -243,10 +231,7 @@ class Formula(object):
                                 if found_removable:
                                     pos1 = int(brackets[i].split(':')[0])
                                     pos2 = int(brackets[j+1].split(':')[0])
-                                    #print 'Removing multiple brackets.'
-                                    #print 'Before:', ' '.join(formula)
                                     formula = formula[:pos1] + formula[pos1+1:pos2] + formula[pos2+1:]
-                                    #print 'After:', ' '.join(formula)
                                     break
 
                 if found_removable: break
@@ -260,10 +245,7 @@ class Formula(object):
                     for bracket in brackets[1:len(brackets)-1]:
                         if bracket.endswith('10'): found_removable = False
                     if found_removable:
-                        #print 'Removing outer brackets.'
-                        #print 'Before:', ' '.join(formula)
                         formula = formula[1:len(formula)-1]
-                        #print 'After:', ' '.join(formula)
 
         return ' '.join(formula)
 
@@ -346,12 +328,12 @@ class Formula(object):
         i = 0
         while i < max_length:
             if formula[i] == self.tools.NOT:
-                if formula[i+1] == self.tools.NOT:    # double negation found
+                if formula[i+1] == self.tools.NOT: # double negation found
                     formula.pop(i)
                     formula.pop(i)
                     i -= 1
                     max_length -= 2
-                elif formula[i+1] == '(':      # 'bad' negation found
+                elif formula[i+1] == '(': # 'bad' negation found
                     formula.pop(i)
                     formula.insert(i+1, self.tools.NOT)
 
@@ -426,8 +408,6 @@ class Formula(object):
                 if current_level > self.tools.MAXIMUM_NESTING_LEVEL:
                     raise MaximalNestingSizeError('maximal nesting size reached.')
 
-                #print 'formula[i] =', formula[i], ', level =', level, ', current_level =', current_level
-
                 if current_level == level and formula[i] == self.tools.OR: # only act if in right level. isolate A, B
                     A, B = self.tools.split(formula, i)
                     first_part = formula[0:self.tools.recursive_search(formula, i, 'left')]
@@ -443,9 +423,6 @@ class Formula(object):
                         # A OR (B1 AND B2) ==> (A OR B1) AND (A OR B2)
                         if local_level == 1 and B[j] == self.tools.AND:
                             B1, B2 = self.tools.split(B, j)
-                            #print 'Splitting B =', ' '.join(B)
-                            #print 'B1 = ', ' '.join(B1)
-                            #print 'B2 = ', ' '.join(B2)
                             changed_part = ' ( ' + ' '.join(A) + ' ' + self.tools.OR + ' ' + ' '.join(B1) + ' ) '
                             changed_part += self.tools.AND + ' ( ' + ' '.join(A) + ' ' + self.tools.OR + ' ' + ' '.join(B2) + ' ) '
                             break
@@ -460,27 +437,15 @@ class Formula(object):
                             # (A1 AND A2) OR B ==> (A1 OR B) AND (A2 OR B)
                             if local_level == 1 and A[j] == self.tools.AND:
                                 A1, A2 = self.tools.split(A, j)
-                                #print 'Splitting A =', ' '.join(A)
-                                #print 'A =', A
-                                #print 'A1 = ', ' '.join(A1)
-                                #print 'A2 = ', ' '.join(A2)
                                 changed_part = ' ( ' + ' '.join(A1) + ' ' + self.tools.OR + ' ' + ' '.join(B) + ' ) '
                                 changed_part += self.tools.AND + ' ( ' + ' '.join(A2) + ' ' + self.tools.OR + ' ' + ' '.join(B) + ' ) '
                                 break
 
                     if changed_part != '':
                         formula = ' '.join(first_part) + changed_part + ' '.join(last_part)
-                        #print 'rebuilding formula.'
-                        #print 'A =', ' '.join(A)
-                        #print 'B =', ' '.join(B)
-                        #print 'first part: ', ' '.join(first_part)
-                        #print 'changed part: ', changed_part
-                        #print 'last part: ', ' '.join(last_part)
-                        #print 'formula =', formula
                         formula = self.tools.to_list(formula)
                         self.validate_brackets(formula) # check
                         max_level = self.tools.get_depth(formula)
-                        #print 'New nesting depth:', max_level
                         restart_level = True
 
         if (self.tools.VERBOSE): print 'CNF: returning formula =', ' '.join(formula)
