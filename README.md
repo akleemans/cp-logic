@@ -139,10 +139,41 @@ For a representation that you can copy-paste into LaTeX, use the `latex`-command
 
     latex(C)
 
-TODO:
+### Resolution
 
-    resolution()
-    dchains()
+For checking which clauses belong to a formula, you can enter
+
+    clause_set(A)
+
+to get all clauses corresponding to the formula A.
+You can also apply resolution directly:
+
+    resolution(A)
+
+The program will then, according to the rules of resolution, try to generate the empty set.
+The sets will be shown, and also if the empty set could be found (which means the formula is not satisfiable) or not (formula satisfiable).
+
+### Deduction chains
+
+For building up series of deduction chains, short dchains, you can use the command
+
+    dchains(A, B, C, ...)
+
+where A, B and C are metavariables or formulas, entered directly. The system will provide a graphical output similar to this one:
+
+![1](../blob/master/tree.png?raw=true)
+![2](../master/tree.png?raw=true)
+![3](https://raw.github.com/captainfox/cp-logic/master/tree.png)
+
+Click on a node for more information, which chain exactly the node is representing.
+
+The color of each node represents wether the underlying chain is an axiom or not:
+ * **red**: chain is not an axiom
+ * **blue**: chain is the *identity*-axiom of PSC
+ * **green**: chain is the *true*-axiom of PSC
+ * **black**: undefined
+
+### Nesting
 
 Functions are nestable to the first degree.
 If a function is specified with a certain form (cnf, nnf, pedantic) it will be resolved first before the function is applied.
@@ -150,12 +181,6 @@ If a function is specified with a certain form (cnf, nnf, pedantic) it will be r
     length(nnf(A))
     sufo(cnf(A))
     latex(pedantic(A))
-
-### Other functions (wip)
-
-    help()
-    clear()
-    set_nesting_depth(20)
 
 ## Documentation
 
@@ -176,7 +201,7 @@ If a function is specified with a certain form (cnf, nnf, pedantic) it will be r
 | `dchains()`    | Use D-chains to prove formula                                                |
 
 ### UML
-![](https://raw.github.com/captainfox/cp-logic/master/UML.png?token=1068130__eyJzY29wZSI6IlJhd0Jsb2I6Y2FwdGFpbmZveC9jcC1sb2dpYy9tYXN0ZXIvVU1MLnBuZyIsImV4cGlyZXMiOjEzODU0NzUxMTF9--914294d347bdaac58dc64b5255b22c870256721d)
+![](https://raw.github.com/captainfox/cp-logic/master/UML.png)
 
 ### Tests
 To run the tests provided, enter

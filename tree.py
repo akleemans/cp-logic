@@ -34,7 +34,7 @@ class Tree(object):
         Constructor
         '''
         self.start_node = start_node
-        self.size = (1600, 900)
+        self.size = (1200, 800)
         self.nodes = []
 
         # calculate depth
