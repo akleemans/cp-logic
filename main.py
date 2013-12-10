@@ -188,9 +188,14 @@ class GUI(QtGui.QMainWindow, Ui_MainWindow):
                 except TimeOutError, e:
                     return '[Error: ' + e.value + ']'
 
-                if satisfiable[0]: s = 'satisfiable with ' +  ', '.join(x for x in satisfiable[1])
-                else: s = 'not satisfiable'
-                return '...is ' + s
+                if satisfiable[0]:
+                    solution = ', '.join(x for x in satisfiable[1])
+                    if solution == '':
+                        s = '... is always true.'
+                    else:
+                        s = '...is satisfiable with ' +  solution
+                else: s = '...is not satisfiable.'
+                return s
 
             # latex
             elif function == 'latex':

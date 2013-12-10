@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'gui.ui'
 #
-# Created: Wed Aug 21 15:18:48 2013
+# Created: Wed Dec 11 00:22:11 2013
 #      by: pyside-uic 0.2.14 running on PySide 1.1.2
 #
 # WARNING! All changes made in this file will be lost!
@@ -12,23 +12,32 @@ from PySide import QtCore, QtGui
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(680, 500)
-        MainWindow.setMinimumSize(QtCore.QSize(680, 500))
-        MainWindow.setMaximumSize(QtCore.QSize(680, 500))
+        MainWindow.resize(670, 510)
         self.centralwidget = QtGui.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
-        self.lineEdit = QtGui.QLineEdit(self.centralwidget)
-        self.lineEdit.setGeometry(QtCore.QRect(10, 421, 581, 20))
-        self.lineEdit.setObjectName("lineEdit")
-        self.pushButton = QtGui.QPushButton(self.centralwidget)
-        self.pushButton.setGeometry(QtCore.QRect(599, 419, 80, 23))
-        self.pushButton.setObjectName("pushButton")
+        self.verticalLayout_3 = QtGui.QVBoxLayout(self.centralwidget)
+        self.verticalLayout_3.setObjectName("verticalLayout_3")
+        self.verticalLayout = QtGui.QVBoxLayout()
+        self.verticalLayout.setObjectName("verticalLayout")
         self.listWidget = QtGui.QListWidget(self.centralwidget)
-        self.listWidget.setGeometry(QtCore.QRect(5, 8, 671, 401))
         self.listWidget.setObjectName("listWidget")
+        self.verticalLayout.addWidget(self.listWidget)
+        self.verticalLayout_3.addLayout(self.verticalLayout)
+        self.lineEdit = QtGui.QLineEdit(self.centralwidget)
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.lineEdit.sizePolicy().hasHeightForWidth())
+        self.lineEdit.setSizePolicy(sizePolicy)
+        self.lineEdit.setMaximumSize(QtCore.QSize(16777215, 25))
+        self.lineEdit.setObjectName("lineEdit")
+        self.verticalLayout_3.addWidget(self.lineEdit)
+        self.pushButton = QtGui.QPushButton(self.centralwidget)
+        self.pushButton.setObjectName("pushButton")
+        self.verticalLayout_3.addWidget(self.pushButton)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtGui.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 680, 25))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 670, 25))
         self.menubar.setObjectName("menubar")
         self.menuDatei = QtGui.QMenu(self.menubar)
         self.menuDatei.setObjectName("menuDatei")
@@ -86,7 +95,6 @@ class Ui_MainWindow(object):
         self.menubar.addAction(self.menu.menuAction())
 
         self.retranslateUi(MainWindow)
-        QtCore.QObject.connect(self.pushButton, QtCore.SIGNAL("clicked()"), MainWindow.buttonPressed)
         QtCore.QObject.connect(self.actionNNF, QtCore.SIGNAL("activated()"), MainWindow.menu_nnf)
         QtCore.QObject.connect(self.actionD_Chains, QtCore.SIGNAL("activated()"), MainWindow.menu_dchains)
         QtCore.QObject.connect(self.actionCNF, QtCore.SIGNAL("activated()"), MainWindow.menu_cnf)
@@ -94,10 +102,11 @@ class Ui_MainWindow(object):
         QtCore.QObject.connect(self.actionSAT_naive, QtCore.SIGNAL("activated()"), MainWindow.menu_sat)
         QtCore.QObject.connect(self.actionLength, QtCore.SIGNAL("activated()"), MainWindow.menu_length)
         QtCore.QObject.connect(self.actionSubformulas, QtCore.SIGNAL("activated()"), MainWindow.menu_sufo)
-        QtCore.QObject.connect(self.lineEdit, QtCore.SIGNAL("returnPressed()"), MainWindow.buttonPressed)
         QtCore.QObject.connect(self.listWidget, QtCore.SIGNAL("itemDoubleClicked(QListWidgetItem*)"), MainWindow.entry_clicked)
         QtCore.QObject.connect(self.actionExport_to_LaTeX, QtCore.SIGNAL("activated()"), MainWindow.menu_latex)
         QtCore.QObject.connect(self.actionPedantic, QtCore.SIGNAL("activated()"), MainWindow.menu_pedantic)
+        QtCore.QObject.connect(self.pushButton, QtCore.SIGNAL("clicked()"), MainWindow.buttonPressed)
+        QtCore.QObject.connect(self.lineEdit, QtCore.SIGNAL("returnPressed()"), MainWindow.buttonPressed)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):

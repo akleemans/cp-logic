@@ -152,6 +152,9 @@ class Formula(object):
                     if self.tools.AND in conj and self.tools.OR in conj and (a in conj_str or b in conj_str):
                         raise FormulaInvalidError('mixed AND and OR on same level')
                     elif sum([1 for x in conj if x == self.tools.IMPL]) > 1:
+                        print 'more than one implication on the same level.'
+                        print 'in error: conj =', ' '.join(conj)
+                        #print 'formula = ', formula
                         raise FormulaInvalidError('more than one implication on the same level')
                     else:
                         pos_groups = []
@@ -182,14 +185,13 @@ class Formula(object):
                                     for j in range(len(pos)):
                                         pos[j] += 2
                                 i += 2
-
                     # clean up
                     conj = []
                     positions = []
 
                 if formula[i] == ')':
                     current_level -= 1
-                if formula[i] == '(':
+                elif formula[i] == '(':
                     current_level += 1
 
                 max_level = max(max_level, current_level)
@@ -199,6 +201,8 @@ class Formula(object):
                     if formula[i] in self.tools.conjunctions:
                         positions.append(i)
                         conj.append(formula[i])
+                        #print 'added ', formula[i], ' to conj =', ' '.join(conj), '. i =', i, ', target_level =', target_level
+                        #print 'formula:', ' '.join(formula)
 
             # finished level
             target_level += 1
@@ -222,16 +226,23 @@ class Formula(object):
             # remove multiple brackets
             for i in range(len(brackets)):
                 if i < len(brackets)-1: # not operating on last element
-                    if int(brackets[i].split(':')[0]) + 1 == int(brackets[i+1].split(':')[0]): # consecutive brackets
+                    if formula[int(brackets[i].split(':')[0])] == '(' and int(brackets[i].split(':')[0]) + 1 == int(brackets[i+1].split(':')[0]): # consecutive brackets
                         for j in range(i+2, len(brackets)-1): # check if ending pair matches
                             if int(brackets[j].split(':')[0]) + 1 == int(brackets[j+1].split(':')[0]) and brackets[i].split(':')[1] == brackets[j+1].split(':')[1][::-1] and brackets[i+1].split(':')[1] == brackets[j].split(':')[1][::-1]:
                                 found_removable = True
                                 for bracket in brackets[i+2:j]:
-                                    if bracket.endswith(brackets[i+1].split(':')[1]): found_removable = False
+                                    print 'Checking', bracket
+                                    if bracket.endswith(brackets[i+1].split(':')[1]):
+                                        print 'Found out that pair is closing earlier at', bracket
+                                        found_removable = False
                                 if found_removable:
+                                    print 'Found real pair:', brackets[i], 'and', brackets[j+1]
+                                    print 'brackets:', brackets
                                     pos1 = int(brackets[i].split(':')[0])
                                     pos2 = int(brackets[j+1].split(':')[0])
+                                    print 'formula old =', ' '.join(formula)
                                     formula = formula[:pos1] + formula[pos1+1:pos2] + formula[pos2+1:]
+                                    print 'formula new =', ' '.join(formula)
                                     break
 
                 if found_removable: break
@@ -308,7 +319,7 @@ class Formula(object):
         for i in range(len(formula)):
             if formula[i] == self.tools.IMPL: # implication found
                 formula[i] = self.tools.OR
-                if formula[i-1].startswith('p'):
+                if formula[i-1][0] in ['p', self.tools.TOP, self.tools.BOTTOM]:
                     formula.insert(i-1, self.tools.NOT)
                 elif formula[i-1] == ')':
                     level = -1
