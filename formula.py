@@ -231,18 +231,18 @@ class Formula(object):
                             if int(brackets[j].split(':')[0]) + 1 == int(brackets[j+1].split(':')[0]) and brackets[i].split(':')[1] == brackets[j+1].split(':')[1][::-1] and brackets[i+1].split(':')[1] == brackets[j].split(':')[1][::-1]:
                                 found_removable = True
                                 for bracket in brackets[i+2:j]:
-                                    print 'Checking', bracket
+                                    #print 'Checking', bracket
                                     if bracket.endswith(brackets[i+1].split(':')[1]):
-                                        print 'Found out that pair is closing earlier at', bracket
+                                        #print 'Found out that pair is closing earlier at', bracket
                                         found_removable = False
                                 if found_removable:
-                                    print 'Found real pair:', brackets[i], 'and', brackets[j+1]
-                                    print 'brackets:', brackets
+                                    #print 'Found real pair:', brackets[i], 'and', brackets[j+1]
+                                    #print 'brackets:', brackets
                                     pos1 = int(brackets[i].split(':')[0])
                                     pos2 = int(brackets[j+1].split(':')[0])
-                                    print 'formula old =', ' '.join(formula)
+                                    #print 'formula old =', ' '.join(formula)
                                     formula = formula[:pos1] + formula[pos1+1:pos2] + formula[pos2+1:]
-                                    print 'formula new =', ' '.join(formula)
+                                    #print 'formula new =', ' '.join(formula)
                                     break
 
                 if found_removable: break

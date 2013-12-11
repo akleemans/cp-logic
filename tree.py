@@ -8,6 +8,7 @@ Example for drawing dchains.
 
 import locale
 import pygame
+from pygame.locals import *
 import time
 import random
 import math
@@ -41,10 +42,21 @@ class Tree(object):
         self.depth = self.get_depth()
 
         # assign coordinates to nodes
+        self.nodes = self.get_nodes()
+        self.set_coordinates()
+
+        # preparing canvas
+        pygame.init()
+        self.disp = pygame.display.set_mode([self.size[0], self.size[1]], RESIZABLE)
+        pygame.display.set_caption("dchains-tree")
+
+        while not self.catch_event():
+            self.draw_board()
+            time.sleep(0.1)
+
+    def set_coordinates(self):
         y_step = self.size[1]/(self.depth+1)
         y = 0
-
-        self.nodes = self.get_nodes()
 
         # assign coordinates
         for node in self.nodes:
@@ -60,15 +72,6 @@ class Tree(object):
                 elif node.name[-1]  == '1': x += x_step
 
             node.set_position(x, y)
-
-        # preparing canvas
-        pygame.init()
-        self.disp = pygame.display.set_mode([self.size[0], self.size[1]])
-        pygame.display.set_caption("dchains-tree")
-
-        while not self.catch_event():
-            self.draw_board()
-            time.sleep(0.1)
 
     def get_nodes(self):
         '''
@@ -157,6 +160,11 @@ class Tree(object):
             if event.type == pygame.QUIT:
                 pygame.quit()
                 return True
+
+            elif event.type == VIDEORESIZE:
+                self.size = event.dict['size']
+                self.disp = pygame.display.set_mode([self.size[0], self.size[1]], RESIZABLE)
+                self.set_coordinates()
 
     def handle_click(self, pos):
         '''
