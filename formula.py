@@ -174,10 +174,10 @@ class Formula(object):
                         for positions in pos_groups:
                             # set brackets recursively until list has only 1 conjunction left
                             while len(positions) >= max_brackets:
-                                pos = self.tools.recursive_search(formula, positions[0], 'left')
+                                pos = self.tools.linear_search(formula, positions[0], 'left')
                                 formula.insert(pos, '(')
 
-                                pos = self.tools.recursive_search(formula, positions[0]+1, 'right')
+                                pos = self.tools.linear_search(formula, positions[0]+1, 'right')
                                 formula.insert(pos+1, ')')
                                 positions.pop(0)
 
@@ -290,17 +290,17 @@ class Formula(object):
 
                     # 1. conjunction rule: add both parts to the subformula set
                     if element[j] in self.tools.conjunctions:
-                        idx = self.tools.recursive_search(element, j, 'left') # left part
+                        idx = self.tools.linear_search(element, j, 'left') # left part
                         new_element = ' '.join(element[idx:j])
                         if new_element not in subformulas: subformulas.append(new_element)
 
-                        idx = self.tools.recursive_search(element, j, 'right') # right part
+                        idx = self.tools.linear_search(element, j, 'right') # right part
                         new_element = ' '.join(element[j+1:idx+1])
                         if new_element not in subformulas: subformulas.append(new_element)
 
                     # 2. NOT rule: add the part after the negation to the sufo-set
                     elif element[j] == self.tools.NOT:
-                        idx = self.tools.recursive_search(element, j, 'right')
+                        idx = self.tools.linear_search(element, j, 'right')
                         new_element = ' '.join(element[j+1:idx+1])
                         if new_element not in subformulas: subformulas.append(new_element)
 
@@ -421,8 +421,8 @@ class Formula(object):
 
                 if current_level == level and formula[i] == self.tools.OR: # only act if in right level. isolate A, B
                     A, B = self.tools.split(formula, i)
-                    first_part = formula[0:self.tools.recursive_search(formula, i, 'left')]
-                    last_part = formula[self.tools.recursive_search(formula, i, 'right')+1:len(formula)]
+                    first_part = formula[0:self.tools.linear_search(formula, i, 'left')]
+                    last_part = formula[self.tools.linear_search(formula, i, 'right')+1:len(formula)]
 
                     changed_part = ''
                     # check for case 1: AND in B
@@ -491,8 +491,8 @@ class Formula(object):
         formula = self.formula
         substitutes = {u'\u2080': u'0', u'\u2081': u'1', u'\u2082': u'2', u'\u2083': u'3', u'\u2084': u'4',
                        u'\u2085': u'5', u'\u2086': u'6', u'\u2087': u'7', u'\u2088': u'8', u'\u2089': u'9',
-                       self.AND: u'\\wedge', self.OR: u'\\vee', self.NOT: u'\\neg', self.IMPL: u'\\rightarrow',
-                       self.TOP: u'\\top', self.BOTTOM: u'\\bot', u'p': u'p_'}
+                       self.tools.AND: u'\\wedge', self.tools.OR: u'\\vee', self.tools.NOT: u'\\neg', self.tools.IMPL: u'\\rightarrow',
+                       self.tools.TOP: u'\\top', self.tools.BOTTOM: u'\\bot', u'p': u'p_'}
 
         for a, b in substitutes.items():
             formula = formula.replace(a, b)

@@ -291,7 +291,7 @@ class GUI(QtGui.QMainWindow, Ui_MainWindow):
         self.lineEdit.setText('cnf(' + self.lineEdit.text() + ')')
 
     def menu_length(self):
-        self.lineEdit.setText('l(' + self.lineEdit.text() + ')')
+        self.lineEdit.setText('length(' + self.lineEdit.text() + ')')
 
     def menu_sat(self):
         self.lineEdit.setText('sat(' + self.lineEdit.text() + ')')
@@ -304,6 +304,15 @@ class GUI(QtGui.QMainWindow, Ui_MainWindow):
 
     def menu_pedantic(self):
         self.lineEdit.setText('pedantic(' + self.lineEdit.text() + ')')
+
+    def menu_evaluate(self):
+        self.lineEdit.setText('evaluate(' + self.lineEdit.text() + ')')
+
+    def menu_clause_set(self):
+        self.lineEdit.setText('clause_set(' + self.lineEdit.text() + ')')
+
+    def menu_resolution(self):
+        self.lineEdit.setText('resolution(' + self.lineEdit.text() + ')')
 
 if __name__ == "__main__":
     app = QtGui.QApplication(sys.argv)

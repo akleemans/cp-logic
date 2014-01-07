@@ -47,6 +47,7 @@
     </item>
    </layout>
   </widget>
+  <widget class="QStatusBar" name="statusbar"/>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
@@ -56,12 +57,6 @@
      <height>25</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuDatei">
-    <property name="title">
-     <string>File</string>
-    </property>
-    <addaction name="actionLoad_formula"/>
-   </widget>
    <widget class="QMenu" name="menu">
     <property name="title">
      <string>?</string>
@@ -72,46 +67,32 @@
     <property name="title">
      <string>Tools</string>
     </property>
-    <addaction name="actionSAT_naive"/>
-    <addaction name="actionD_Chains"/>
+    <addaction name="actionLength"/>
+    <addaction name="actionSufo"/>
+    <addaction name="separator"/>
+    <addaction name="actionSat"/>
+    <addaction name="actionDchains"/>
+    <addaction name="actionEvaluate"/>
+    <addaction name="actionClause_set"/>
+    <addaction name="actionResolution"/>
    </widget>
    <widget class="QMenu" name="menuFormula">
     <property name="title">
      <string>Formula</string>
     </property>
-    <addaction name="actionLength"/>
-    <addaction name="actionSubformulas"/>
-    <addaction name="separator"/>
     <addaction name="actionPedantic"/>
     <addaction name="actionNNF"/>
     <addaction name="actionCNF"/>
     <addaction name="separator"/>
-    <addaction name="actionExport_to_LaTeX"/>
+    <addaction name="actionLatex"/>
    </widget>
-   <addaction name="menuDatei"/>
    <addaction name="menuFormula"/>
    <addaction name="menuTools"/>
    <addaction name="menu"/>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
-  <action name="actionConvert_to_NNF">
+  <action name="actionDchains">
    <property name="text">
-    <string>Convert to NNF</string>
-   </property>
-  </action>
-  <action name="actionConvert_to_CNF">
-   <property name="text">
-    <string>Convert to CNF</string>
-   </property>
-  </action>
-  <action name="actionD_Chains">
-   <property name="text">
-    <string>D-Chains</string>
-   </property>
-  </action>
-  <action name="actionLoad_formula">
-   <property name="text">
-    <string>Load formula...</string>
+    <string>dchains()</string>
    </property>
   </action>
   <action name="actionInfo">
@@ -121,42 +102,52 @@
   </action>
   <action name="actionNNF">
    <property name="text">
-    <string>NNF</string>
+    <string>nnf()</string>
    </property>
   </action>
   <action name="actionCNF">
    <property name="text">
-    <string>CNF</string>
+    <string>cnf()</string>
    </property>
   </action>
-  <action name="actionLength">
+  <action name="actionSat">
    <property name="text">
-    <string>Length</string>
+    <string>sat()</string>
    </property>
   </action>
-  <action name="actionSAT_naive">
+  <action name="actionLatex">
    <property name="text">
-    <string>SAT (naive)</string>
-   </property>
-  </action>
-  <action name="actionGenerate">
-   <property name="text">
-    <string>Generate formula</string>
-   </property>
-  </action>
-  <action name="actionSubformulas">
-   <property name="text">
-    <string>Subformulas</string>
-   </property>
-  </action>
-  <action name="actionExport_to_LaTeX">
-   <property name="text">
-    <string>Export to LaTeX</string>
+    <string>latex()</string>
    </property>
   </action>
   <action name="actionPedantic">
    <property name="text">
-    <string>Pedantic</string>
+    <string>pedantic()</string>
+   </property>
+  </action>
+  <action name="actionLength">
+   <property name="text">
+    <string>length()</string>
+   </property>
+  </action>
+  <action name="actionEvaluate">
+   <property name="text">
+    <string>evaluate()</string>
+   </property>
+  </action>
+  <action name="actionResolution">
+   <property name="text">
+    <string>resolution()</string>
+   </property>
+  </action>
+  <action name="actionSufo">
+   <property name="text">
+    <string>sufo()</string>
+   </property>
+  </action>
+  <action name="actionClause_set">
+   <property name="text">
+    <string>clause_set()</string>
    </property>
   </action>
  </widget>
@@ -179,7 +170,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>actionD_Chains</sender>
+   <sender>actionDchains</sender>
    <signal>activated()</signal>
    <receiver>MainWindow</receiver>
    <slot>menu_dchains()</slot>
@@ -211,58 +202,10 @@
    </hints>
   </connection>
   <connection>
-   <sender>actionLoad_formula</sender>
-   <signal>activated()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>menu_loadformula()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>339</x>
-     <y>249</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>actionSAT_naive</sender>
+   <sender>actionSat</sender>
    <signal>activated()</signal>
    <receiver>MainWindow</receiver>
    <slot>menu_sat()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>339</x>
-     <y>249</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>actionLength</sender>
-   <signal>activated()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>menu_length()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>339</x>
-     <y>249</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>actionSubformulas</sender>
-   <signal>activated()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>menu_sufo()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>-1</x>
@@ -291,7 +234,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>actionExport_to_LaTeX</sender>
+   <sender>actionLatex</sender>
    <signal>activated()</signal>
    <receiver>MainWindow</receiver>
    <slot>menu_latex()</slot>
@@ -330,7 +273,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>660</x>
-     <y>444</y>
+     <y>478</y>
     </hint>
     <hint type="destinationlabel">
      <x>550</x>
@@ -345,12 +288,92 @@
    <slot>buttonPressed()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>228</x>
-     <y>457</y>
+     <x>237</x>
+     <y>445</y>
     </hint>
     <hint type="destinationlabel">
      <x>343</x>
      <y>-12</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionResolution</sender>
+   <signal>activated()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>menu_resolution()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>334</x>
+     <y>254</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionSufo</sender>
+   <signal>activated()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>menu_sufo()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>334</x>
+     <y>254</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionLength</sender>
+   <signal>activated()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>menu_length()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>334</x>
+     <y>254</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionClause_set</sender>
+   <signal>activated()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>menu_clause_set()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>334</x>
+     <y>254</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionEvaluate</sender>
+   <signal>activated()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>menu_evaluate()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>334</x>
+     <y>254</y>
     </hint>
    </hints>
   </connection>
@@ -368,5 +391,8 @@
   <slot>entry_clicked()</slot>
   <slot>menu_latex()</slot>
   <slot>menu_pedantic()</slot>
+  <slot>menu_clause_set()</slot>
+  <slot>menu_evaluate()</slot>
+  <slot>menu_resolution()</slot>
  </slots>
 </ui>

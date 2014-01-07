@@ -28,7 +28,7 @@ class Tools(object):
         Constructor
         '''
         # static
-        self.MAXIMUM_NESTING_LEVEL = 20
+        self.MAXIMUM_NESTING_LEVEL = 50
         self.MAXIMUM_RESOLUTION_SIZE = 50
         self.VERBOSE = False
 
@@ -196,10 +196,10 @@ class Tools(object):
             print 'got "' + formula[i] + '" instead'
             raise UnexpectedTokenError('can only find neighbours of conjunctions.')
 
-        idx = self.recursive_search(formula, i, 'left')
+        idx = self.linear_search(formula, i, 'left')
         A = formula[idx:i]
 
-        idx = self.recursive_search(formula, i, 'right')
+        idx = self.linear_search(formula, i, 'right')
         B = formula[i+1:idx+1]
 
         return A, B
@@ -272,7 +272,7 @@ class Tools(object):
 
         return is_axiom
 
-    def recursive_search(self, formula, index, direction):
+    def linear_search(self, formula, index, direction):
         '''
         Returns the position of the last part which lies on the same level in the formula.
         The search accepts 'left' or 'right' as direction and will stop if the beginning or end is reached.
