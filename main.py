@@ -8,8 +8,7 @@ Loads the UI and the formula class.
 '''
 
 import sys
-from PySide.QtGui import *
-from PySide.QtCore import *
+from PyQt4 import QtCore, QtGui
 from gui import *
 from formula import *
 from tools import *

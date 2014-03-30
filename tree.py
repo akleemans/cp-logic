@@ -12,6 +12,8 @@ from pygame.locals import *
 import time
 import random
 import math
+import os
+import sys
 
 import tools
 import formula
@@ -53,6 +55,11 @@ class Tree(object):
         while not self.catch_event():
             self.draw_board()
             time.sleep(0.1)
+
+    def resource_path(self, relative):
+        if hasattr(sys, "_MEIPASS"):
+            return os.path.join(sys._MEIPASS, relative)
+        return os.path.join(relative)
 
     def set_coordinates(self):
         y_step = self.size[1]/(self.depth+1)
@@ -109,9 +116,13 @@ class Tree(object):
         Starts up a pygame-canvas and draws the graph.
         '''
         pygame.draw.rect(self.disp, (254, 254, 254), (0, 0, self.size[0], self.size[1]))
-        small_font = pygame.font.SysFont(u'dejavuserif', 14)
-        normal_font = pygame.font.SysFont(u'monospace', 16)
-
+        
+        #small_font = pygame.font.SysFont(u'dejavuserif', 14)
+        #normal_font = pygame.font.SysFont(u'monospace', 16)
+        
+        small_font = pygame.font.Font(self.resource_path(os.path.join('data', 'lucidasansuni.ttf')), 14)
+        normal_font = pygame.font.Font(self.resource_path(os.path.join('data', 'lucidasansuni.ttf')), 16)
+        
         for node in self.nodes:
             # precalculate label
             name = str(len(node.name)) + '_' + node.name[-1]
