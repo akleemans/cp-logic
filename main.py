@@ -87,6 +87,7 @@ class GUI(QtGui.QMainWindow, Ui_MainWindow):
         if (self.tools.VERBOSE): print '0. Starting with:', text
         # 1. Check if the statement is an assignment
         assignment_flag = ''
+        text = str(text)
         if text.find('=') != -1:                      # assignment
             if len(text.split('=')[0].strip()) == 1:
                 assignment_flag = text.split('=')[0].strip()

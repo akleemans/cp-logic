@@ -1,0 +1,2 @@
+Ubuntu: pyinstaller main.spec --onefile
+Windows: c:\python27\Scripts\pyinstaller main.spec --onefile
