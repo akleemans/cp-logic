@@ -124,15 +124,18 @@ class Tree(object):
         normal_font = pygame.font.Font(self.resource_path(os.path.join('data', 'lucidasansuni.ttf')), 16)
         
         for node in self.nodes:
-            # precalculate label
+            # precalculate labels
             name = str(len(node.name)) + '_' + node.name[-1]
             label = small_font.render(name, 1, BLACK)
+            edge_label = small_font.render(node.edge, 1, BLACK)
             x_offset = label.get_width()/2
             y_offset = label.get_height()/2
 
             # draw line to parent
             if node.parent != None:
                 pygame.draw.line(self.disp, GRAY, (node.parent.x, node.parent.y), (node.x, node.y), 1)
+                # draw edge label
+                self.disp.blit(edge_label, ((node.parent.x + node.x)/2, (node.parent.y + node.y)/2))
 
             # draw label
             self.disp.blit(label, (node.x-x_offset, node.y-y_offset))

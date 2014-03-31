@@ -18,13 +18,15 @@ class Node(object):
     Each node has 0-2 children, depending on its chain.
     '''
 
-    def __init__(self, chain, name, parent=None):
+    def __init__(self, chain, name, edge='', parent=None):
         ''' Constructor '''
         self.tools = tools.Tools()
 
         self.name = name
         self.chain = chain
+        #self.chain = formula.Formula(chain).formula_nnf.replace(' ', '')
         self.parent = parent
+        self.edge = edge
         self.children = []
         self.axiom = 'undef' # undef, no, id, true
         self.status = ''
@@ -91,14 +93,14 @@ class Node(object):
                 if last_part != '': last_part = ',' + last_part
 
                 if part[pos] == self.tools.OR:
-                    self.children.append(Node(first_part + part[:pos] + ',' + part[pos+1:] + last_part, self.name + '0', self))
+                    self.children.append(Node(first_part + part[:pos] + ',' + part[pos+1:] + last_part, self.name + '0', self.tools.OR, self))
                     break
 
                 elif part[pos] == self.tools.AND:
                     chain1 = first_part + part[:pos] + last_part
                     chain2 = first_part + part[pos+1:] + last_part
-                    self.children.append(Node(chain1, self.name + '0', self))
-                    self.children.append(Node(chain2, self.name + '1', self))
+                    self.children.append(Node(chain1, self.name + '0', self.tools.AND, self))
+                    self.children.append(Node(chain2, self.name + '1', self.tools.AND, self))
                     break
 
                 if len(self.children) > 0:

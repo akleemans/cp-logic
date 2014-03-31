@@ -100,10 +100,11 @@ class GUI(QtGui.QMainWindow, Ui_MainWindow):
         # 2. Substitute meta variables with existing formulas
         capitals = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
         text = ' ' + text + ' '
-        delimiters = [' ', '(', ')']
+        delimiters = [' ', '(', ')', ',']
 
         text_new = ''
-        for i in range(1, len(text)-1):
+        #for i in range(1, len(text)-1):
+        for i in range(len(text)-1):
             if text[i] in capitals and text[i-1] in delimiters and text[i+1] in delimiters:
                 try:
                     text_new += '(' + self.get_formula(text[i]).formula + ')'
@@ -244,10 +245,11 @@ class GUI(QtGui.QMainWindow, Ui_MainWindow):
 
             # dchains
             elif function == 'dchains':
-                #formula_list = []
-                #for f in formula.split(','):
-                #    formula_list.append(f)
                 formula_list = formula.split(',')
+                
+                # check for metavariables
+                print 'working with', formula_list
+                #print 'All metavariables should be resolved at this stage!'
 
                 is_axiom = self.tools.dchains(formula_list)
                 if is_axiom:
@@ -256,8 +258,6 @@ class GUI(QtGui.QMainWindow, Ui_MainWindow):
                     summary = 'Not a valid chain in PSC.'
 
                 return summary
-
-            # ...
 
         else:                                           # plain formula
             f = self.build_formula(text, anon)

@@ -52,6 +52,8 @@ class Formula(object):
         residue = re.sub(ur'([0-9p() \u2227\u2228\u00AC\u2192\u22A4\u22A5\u2080\u2081\u2082\u2083\u2084\u2085\u2086'
                        + ur'\u2087\u2088\u2089]+)', '', formula)
         if len(residue) != 0:
+            print 'formula:', formula
+            print 'residue:', residue
             raise FormulaInvalidError('illegal characters: '+residue)
 
         # removing spaces
