@@ -38,42 +38,41 @@ You can now enter one of the examples or test
 
 ## Examples
 
-When entering a formula, you can enter either in plain ASCII or copy-paste Unicode.
-The tokens you can use are listed here:
+The tokens you can use are listed in the following table. You can enter them as plain ASCII charcters or as Unicode symbols (via copy-paste).
 
-| ASCII token  | symbol | meaning                                                             |
-|:-------------|:-------|:--------------------------------------------------------------------|
-| `p0`         |  p₀    | A basic proposition. Must contain an index number.                  |
-| `AND`        |  ∧     | logical AND                                                         |
-| `OR`         |  ∨     | logical OR                                                          |
-| `NOT`        |  ¬     | logical NOT                                                         |
-| `IMPL`       |  →     | implication                                                         |
-| `TOP`        |  ⊤     | TOP (always evaluated as true)                                      |
-| `BOTTOM`     |  ⊥     | BOTTOM (always evaluated as false)                                  |
-| `( )`        |  ( )   | brackets, can be used to structure the formula                      |
-| `A`          |  A     | capital letters always stand for metavariables                      |
+| ASCII character  | unicode symbol | meaning                                                             |
+|:-----------------|:---------------|:--------------------------------------------------------------------|
+| `p0`             |  p₀            | A basic proposition. Must contain an index number.                  |
+| `AND`            |  ∧             | logical AND                                                         |
+| `OR`             |  ∨             | logical OR                                                          |
+| `NOT`            |  ¬             | logical NOT                                                         |
+| `IMPL`           |  →             | implication                                                         |
+| `TOP`            |  ⊤             | TOP (always evaluated as true)                                      |
+| `BOTTOM`         |  ⊥             | BOTTOM (always evaluated as false)                                  |
+| `( )`            |  ( )           | brackets, can be used to structure the formula                      |
+| `A`              |  A             | capital letters always stand for metavariables                      |
 
 ### Defining a formula
 
-You can either just enter a formula right away
+You can either just enter a formula directly
 
     p0 AND p1
     p3 OR NOT (p1 AND TOP)
 
-or you can make an assignment to a so-called meta-variable.
-You can use the capital letters A-Z for storing formulas.
+or you can make an assignment to a so-called metavariable.
+You can use the capital letters A-Z for storing metavariables.
 
     A = NOT p0 AND (p1 AND p2 IMPL NOT p1)
     B = p3 OR NOT (p2 AND p4)
 
-Metavariables will always be evaluated first, so you can use them along or even in the middle of other formulas:
+Metavariables can be used to define other formulas or metavariables:
 
     C = A AND NOT B
 
-### Change form
+### Application of a function
 
-Once you have some formulas stored (or you can also enter them directly), you can change their forms.
-For example, the **normal negation** form can be obtained with
+Several forms of a formula can be calculated using the corresponding functions.
+For example, the *negation normal form** form can be obtained with
 
     nnf(p0 AND p1 IMPL p2)
 
@@ -86,32 +85,31 @@ There's an intern representation of the formulat called `pedantic`, which you ca
 
     C = pedantic(B)
 
-The **conjunctive normal** form you get with
+You can get the **conjunctive normal form** by entering
 
     cnf(D)
 
-Here too you can use the 'form-modifiers' directly in the middle of a formula, they will be evaluated first:
+You can use functions like nnf, cnf or pedantic directly in the middle of a formula, they will be evaluated first:
 
     C = cnf(A) OR NOT nnf(NOT B OR p0)
 
-### Apply a function
-
+There are many other formulas which (instead of a formula) will give you an explicit result like a boolean value, a integer or a drawn tree. 
 For a simple satisfiability test, use
 
     sat(A)
 
-which will return if A is satisfiable and if yes, which valuation it satisfies.
+This function will return a satisfying assignment (if any) for A.
 
-For the clause set (which will be obtained through CNF) enter
+In order to obtain the clause set of a formula A enter
 
     clause_set(A)
 
-which will provide the corresponding set in set notation.
+which will provide the corresponding clause set, obtained by the cnf of A.
 For the length, enter
 
     length(A)
 
-and the elements of the formula will be counted and shown as an integer.
+This function will return the number of occurrences of atomic formulas and logical connectives in A.
 
 Formulas can also be divided and subdivided in their subformulas.
 For a given formula, all subformulas are shown using
@@ -129,11 +127,9 @@ and
 
 will result in a different set of subformulas.
 
-If you want to evaluate how a certain formula without propositions evaluates, you can simply enter
+You can find the truth value which is equivalent to a formula without propositional variables as it is shown in the following example:
 
     evaluate(⊤ ∧ ( ⊥ ∨ ⊥ ))
-
-which will then be resolved to a single `True` or `False`-Value.
 
 For a representation that you can copy-paste into LaTeX, use the `latex`-command:
 
@@ -141,21 +137,23 @@ For a representation that you can copy-paste into LaTeX, use the `latex`-command
 
 ### Resolution
 
-For checking which clauses belong to a formula, you can enter
+As seen,
 
     clause_set(A)
 
-to get all clauses corresponding to the formula A.
+will return all clauses corresponding to the formula A.
 You can also apply resolution directly:
 
     resolution(A)
 
 The program will then, according to the rules of resolution, try to generate the empty set.
-The sets will be shown, and also if the empty set could be found (which means the formula is not satisfiable) or not (formula satisfiable).
+The first 10 clauses will be shown. The program will report
+
+wether the empty clause was found (which means that the formula is not satisfiable) or not (which means that the formula is satisfiable).
 
 ### Deduction chains
 
-For building up series of deduction chains, short dchains, you can use the command
+For building up series of deduction chains (dchains for short), you can use the command
 
     dchains(A, B, C, ...)
 
@@ -163,9 +161,9 @@ where A, B and C are metavariables or formulas, entered directly. The system wil
 
 ![](../master/tree.png?raw=true)
 
-Click on a node for more information, which chain exactly the node is representing.
+By clicking on a node, you can see which sequence the node is representing.
 
-The color of each node represents wether the underlying chain is an axiom or not:
+The color of each node represents wether the underlying sequence is an axiom or not:
  * **red**: chain is not an axiom
  * **blue**: chain is the *identity*-axiom of PSC
  * **green**: chain is the *true*-axiom of PSC
@@ -173,8 +171,7 @@ The color of each node represents wether the underlying chain is an axiom or not
 
 ### Nesting
 
-Functions are nestable to the first degree.
-If a function is specified with a certain form (cnf, nnf, pedantic) it will be resolved first before the function is applied.
+Functions are nestable to the first degree:
 
     length(nnf(A))
     sufo(cnf(A))
@@ -186,15 +183,15 @@ If a function is specified with a certain form (cnf, nnf, pedantic) it will be r
 
 | function       | meaning                                                                      |
 |:---------------|:-----------------------------------------------------------------------------|
-| `length()`     | Returns the length of a given formula                                        |
-| `sufo()`       | Returns all subformulas from a given formula                                 |
-| `latex()`      | Returns a latex representation of a given formula                            |
-| `pedantic()`   | Returns a pedantic (binary) representation of a given formula                |
-| `nnf()`        | Returns a formula in negation normal form                                    |
-| `cnf()`        | Returns a formula in conjunctive normal form                                 |
+| `length()`     | Returns the length of the given formula                                      |
+| `sufo()`       | Returns all subformulas from the given formula                               |
+| `latex()`      | Returns a latex representation of the given formula                          |
+| `pedantic()`   | Returns a pedantic (binary) representation of the given formula              |
+| `nnf()`        | Returns the given formula converted in negation normal form                  |
+| `cnf()`        | Returns the given formula converted to conjunctive normal form               |
 | `sat()`        | Returns, if possible, a valid valuation for the given formula                |
-| `clause_set()` | Calculates the corresponding clause set for a given formula                  |
-| `evaluate()`   | Evaluate a formula (without propositions)                                    |
+| `clause_set()` | Calculates the corresponding clause set for the given formula                |
+| `evaluate()`   | Evaluate the formula (without propositions)                                  |
 | `resolution()` | Apply resolution                                                             |
 | `dchains()`    | Use D-chains to prove formula                                                |
 
@@ -202,6 +199,6 @@ If a function is specified with a certain form (cnf, nnf, pedantic) it will be r
 ![](../master/UML.png?raw=true)
 
 ### Tests
-To run the tests provided, enter
+To run the provided tests, enter
 
     python tests.py
