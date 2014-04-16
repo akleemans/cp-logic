@@ -269,6 +269,7 @@ class GUI(QtGui.QMainWindow, Ui_MainWindow):
     def buttonPressed(self):
         entry = ''
         text = self.lineEdit.text()
+        self.lineEdit.clear()
         self.listWidget.addItem('>> ' + text)
 
         entry = self.analyze_input(text)
