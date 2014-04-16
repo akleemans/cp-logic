@@ -27,7 +27,7 @@ class GUI(QtGui.QMainWindow, Ui_MainWindow):
         self.formulas = []
 
     def entry_clicked(self, b):
-        text = b.text()
+        text = str(b.text())
         if text.find(']') != -1:
             text = text.split('] ')[1]
         self.lineEdit.setText(text.replace('>', '').strip())
