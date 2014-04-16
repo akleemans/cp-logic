@@ -93,7 +93,7 @@ You can use functions like nnf, cnf or pedantic directly in the middle of a form
 
     C = cnf(A) OR NOT nnf(NOT B OR p0)
 
-There are many other formulas which (instead of a formula) will give you an explicit result like a boolean value, a integer or a drawn tree. 
+There are many other functions which (instead of a formula) will give you an explicit result like a boolean value, an integer or a drawn tree. 
 For a simple satisfiability test, use
 
     sat(A)
@@ -163,7 +163,7 @@ where A, B and C are metavariables or formulas, entered directly. The system wil
 
 By clicking on a node, you can see which sequence the node is representing.
 
-The color of each node represents wether the underlying sequence is an axiom or not:
+The color of each node represents whether the underlying sequence is an axiom or not:
  * **red**: chain is not an axiom
  * **blue**: chain is the *identity*-axiom of PSC
  * **green**: chain is the *true*-axiom of PSC
