@@ -175,7 +175,7 @@ class Tree(object):
                 #print 'Size of label:', label.get_width()
                 self.world.blit(label, (node.x-label.get_width()/2+5, node.y-40))
 
-        self.disp.blit(self.world, ((self.knob.left / self.ratio) * -1 , 0))
+        self.disp.blit(self.world, ((self.knob.left / self.ratio) * -1, 0))
         pygame.draw.rect(self.disp, WHITE, self.track, 0 )
         pygame.draw.rect(self.disp, BLUE, self.knob.inflate(0,-5), 2)
             
@@ -188,7 +188,10 @@ class Tree(object):
         '''
         for event in pygame.event.get():
             if event.type == pygame.MOUSEBUTTONUP:
-                self.handle_click(pygame.mouse.get_pos())
+                # TODO calculate scrolling-offset
+                pos = pygame.mouse.get_pos()
+                self.handle_click((pos[0] + (self.knob.left / self.ratio), pos[1]))
+                
             if event.type == pygame.QUIT:
                 pygame.quit()
                 return True
