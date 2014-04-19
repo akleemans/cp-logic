@@ -142,11 +142,17 @@ class Formula(object):
         current_level = 0
         conj = []
         positions = []
-
+        
+        # setting brackets
         while target_level <= max_level:
             current_level = 0
-            for i in range(len(formula)):
+            i = -1
+            while i < len(formula)-1:
+                i += 1
+            #for i in range(len(formula)): # loop variables can not be modified from inside the loop...
+                #print 'before - i:', i, 'formula[i]:', formula[i]
                 if formula[i] == ')' and current_level == target_level or i == len(formula) - 1: # and current_level == 1:
+                    #print 'closing current_level:', current_level, 'with i =', i
                     # check for invalid formulas.
                     a = self.tools.AND + self.tools.OR
                     b = self.tools.OR + self.tools.AND
@@ -156,13 +162,12 @@ class Formula(object):
                     elif sum([1 for x in conj if x == self.tools.IMPL]) > 1:
                         print 'more than one implication on the same level.'
                         print 'in error: conj =', ' '.join(conj)
-                        #print 'formula = ', formula
                         raise FormulaInvalidError('more than one implication on the same level')
                     else:
                         pos_groups = []
 
                         if self.tools.IMPL in conj:
-                            idx = conj.index(self.tools.IMPL) #print 'Index of impl at', idx
+                            idx = conj.index(self.tools.IMPL)
                             pos_groups.append(positions[:idx])
                             pos_groups.append(positions[idx+1:])
                         else:
@@ -173,9 +178,11 @@ class Formula(object):
                         elif len(pos_groups) == 2:
                             max_brackets = 1
 
+                        #print 'conj:', conj_str, 'pos_groups:', pos_groups
                         for positions in pos_groups:
                             # set brackets recursively until list has only 1 conjunction left
                             while len(positions) >= max_brackets:
+                                #print 'setting brackets from', ' '.join(formula)
                                 pos = self.tools.linear_search(formula, positions[0], 'left')
                                 formula.insert(pos, '(')
 
@@ -187,15 +194,20 @@ class Formula(object):
                                     for j in range(len(pos)):
                                         pos[j] += 2
                                 i += 2
+                        #print 'after brackets-setting-loop:', ' '.join(formula)
+                        
                     # clean up
                     conj = []
                     positions = []
-
+                    
+                
+                #print 'after - i:', i, 'formula[i]:', formula[i]
+                # if not at the end of current level, continue here:
                 if formula[i] == ')':
                     current_level -= 1
                 elif formula[i] == '(':
                     current_level += 1
-
+                
                 max_level = max(max_level, current_level)
 
                 # get conjunctions on current level
@@ -210,7 +222,7 @@ class Formula(object):
             target_level += 1
             conj = []
             positions = []
-
+    
         found_removable = True
 
         while found_removable:
@@ -259,7 +271,8 @@ class Formula(object):
                         if bracket.endswith('10'): found_removable = False
                     if found_removable:
                         formula = formula[1:len(formula)-1]
-
+                        
+        #print 'checkpoint 3', ' '.join(formula)
         return ' '.join(formula)
 
     def clause_set(self):

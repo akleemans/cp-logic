@@ -346,8 +346,13 @@ class Tests(unittest.TestCase):
     def test_pedantic11(self):
         string = 'p0 OR (p1 AND p2 AND p3) IMPL (p5 AND (p6 OR p7) AND p8)'
         formula = Formula(string)
-        self.failUnless(self.tools.equal(formula.formula_pedantic, u'p₀ ∨ ( ( p₁ ∧ p₂ ) ∧ p₃ ) → ( p₅ ∧ ( p₆ ∨ p₇ ) ) ∧ p₈'))
+        self.failUnless(self.tools.equal(formula.formula_pedantic, u'( p₀ ∨ ( ( p₁ ∧ p₂ ) ∧ p₃ ) ) → ( ( p₅ ∧ ( p₆ ∨ p₇ ) ) ∧ p₈ )'))
 
+    def test_pedantic12(self): # error with modified loop variables
+        string = '(p0 AND p1 IMPL p1) AND (p0 AND p1 IMPL p1)'
+        formula = Formula(string)
+        self.failUnless(self.tools.equal(formula.formula_nnf, u'( ( ¬ p₀ ∨ ¬ p₁ ) ∨ p₁ ) ∧ ( ( ¬ p₀ ∨ ¬ p₁ ) ∨ p₁ )'))
+        
     ### nnf()
 
     def test_nnf1(self):
@@ -600,8 +605,8 @@ class Tests(unittest.TestCase):
     def test_clauses8(self):
         string = 'p0 OR (p1 AND p2 AND p3) IMPL (p5 AND (p6 OR p7) AND p8)'
         formula = Formula(string)
-        self.failUnless(formula.clause_set()[0], [u'p₀', u'¬p₁', u'¬p₂', u'¬p₃', u'p₅'])
-        self.failUnless(len(formula.clause_set()) == 3)
+        self.failUnless(formula.clause_set()[0], [u'{¬p₀, p₅}',  u'{¬p₁, ¬p₂, ¬p₃, p₅}', u'{¬p₀, p₆, p₇}', u'{¬p₁, ¬p₂, ¬p₃, p₆, p₇}', u'{¬p₀, p₈}', u'{¬p₁, ¬p₂, ¬p₃, p₈}'])
+        self.failUnless(len(formula.clause_set()) == 6)
 
     ### evaluate()
 
