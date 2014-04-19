@@ -1,0 +1,6 @@
+A = p0 OR NOT (p1 AND NOT p2)
+B = p2 AND p1 IMPL NOT p3
+C = NOT p0 AND p1 AND NOT p2 AND (p1 OR NOT p2)
+nnf(A)
+cnf(B)
+dchains(A AND NOT (C OR B))

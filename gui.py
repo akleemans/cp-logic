@@ -2,12 +2,12 @@
 
 # Form implementation generated from reading ui file 'gui.ui'
 #
-# Created: Tue Jan  7 22:02:50 2014
+# Created: Sat Apr 19 13:05:03 2014
 #      by: pyside-uic 0.2.14 running on PySide 1.1.2
 #
 # WARNING! All changes made in this file will be lost!
 
-from PyQt4 import QtCore, QtGui
+from PySide import QtCore, QtGui
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -42,12 +42,12 @@ class Ui_MainWindow(object):
         self.menubar = QtGui.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 670, 25))
         self.menubar.setObjectName("menubar")
-        self.menu = QtGui.QMenu(self.menubar)
-        self.menu.setObjectName("menu")
         self.menuTools = QtGui.QMenu(self.menubar)
         self.menuTools.setObjectName("menuTools")
         self.menuFormula = QtGui.QMenu(self.menubar)
         self.menuFormula.setObjectName("menuFormula")
+        self.menuFile = QtGui.QMenu(self.menubar)
+        self.menuFile.setObjectName("menuFile")
         MainWindow.setMenuBar(self.menubar)
         self.actionDchains = QtGui.QAction(MainWindow)
         self.actionDchains.setObjectName("actionDchains")
@@ -73,7 +73,10 @@ class Ui_MainWindow(object):
         self.actionSufo.setObjectName("actionSufo")
         self.actionClause_set = QtGui.QAction(MainWindow)
         self.actionClause_set.setObjectName("actionClause_set")
-        self.menu.addAction(self.actionInfo)
+        self.actionImport_file = QtGui.QAction(MainWindow)
+        self.actionImport_file.setObjectName("actionImport_file")
+        self.actionClear_Session = QtGui.QAction(MainWindow)
+        self.actionClear_Session.setObjectName("actionClear_Session")
         self.menuTools.addAction(self.actionLength)
         self.menuTools.addAction(self.actionSufo)
         self.menuTools.addSeparator()
@@ -87,9 +90,11 @@ class Ui_MainWindow(object):
         self.menuFormula.addAction(self.actionCNF)
         self.menuFormula.addSeparator()
         self.menuFormula.addAction(self.actionLatex)
+        self.menuFile.addAction(self.actionImport_file)
+        self.menuFile.addAction(self.actionClear_Session)
+        self.menubar.addAction(self.menuFile.menuAction())
         self.menubar.addAction(self.menuFormula.menuAction())
         self.menubar.addAction(self.menuTools.menuAction())
-        self.menubar.addAction(self.menu.menuAction())
 
         self.retranslateUi(MainWindow)
         QtCore.QObject.connect(self.actionNNF, QtCore.SIGNAL("activated()"), MainWindow.menu_nnf)
@@ -106,14 +111,16 @@ class Ui_MainWindow(object):
         QtCore.QObject.connect(self.actionLength, QtCore.SIGNAL("activated()"), MainWindow.menu_length)
         QtCore.QObject.connect(self.actionClause_set, QtCore.SIGNAL("activated()"), MainWindow.menu_clause_set)
         QtCore.QObject.connect(self.actionEvaluate, QtCore.SIGNAL("activated()"), MainWindow.menu_evaluate)
+        QtCore.QObject.connect(self.actionImport_file, QtCore.SIGNAL("activated()"), MainWindow.menu_import)
+        QtCore.QObject.connect(self.actionClear_Session, QtCore.SIGNAL("activated()"), MainWindow.menu_clear)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QtGui.QApplication.translate("MainWindow", "Toolbox Classical Propositional Logic", None, QtGui.QApplication.UnicodeUTF8))
         self.pushButton.setText(QtGui.QApplication.translate("MainWindow", "Go", None, QtGui.QApplication.UnicodeUTF8))
-        self.menu.setTitle(QtGui.QApplication.translate("MainWindow", "?", None, QtGui.QApplication.UnicodeUTF8))
         self.menuTools.setTitle(QtGui.QApplication.translate("MainWindow", "Tools", None, QtGui.QApplication.UnicodeUTF8))
         self.menuFormula.setTitle(QtGui.QApplication.translate("MainWindow", "Formula", None, QtGui.QApplication.UnicodeUTF8))
+        self.menuFile.setTitle(QtGui.QApplication.translate("MainWindow", "File", None, QtGui.QApplication.UnicodeUTF8))
         self.actionDchains.setText(QtGui.QApplication.translate("MainWindow", "dchains()", None, QtGui.QApplication.UnicodeUTF8))
         self.actionInfo.setText(QtGui.QApplication.translate("MainWindow", "Info", None, QtGui.QApplication.UnicodeUTF8))
         self.actionNNF.setText(QtGui.QApplication.translate("MainWindow", "nnf()", None, QtGui.QApplication.UnicodeUTF8))
@@ -126,4 +133,6 @@ class Ui_MainWindow(object):
         self.actionResolution.setText(QtGui.QApplication.translate("MainWindow", "resolution()", None, QtGui.QApplication.UnicodeUTF8))
         self.actionSufo.setText(QtGui.QApplication.translate("MainWindow", "sufo()", None, QtGui.QApplication.UnicodeUTF8))
         self.actionClause_set.setText(QtGui.QApplication.translate("MainWindow", "clause_set()", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionImport_file.setText(QtGui.QApplication.translate("MainWindow", "Import file...", None, QtGui.QApplication.UnicodeUTF8))
+        self.actionClear_Session.setText(QtGui.QApplication.translate("MainWindow", "Clear Session", None, QtGui.QApplication.UnicodeUTF8))
 

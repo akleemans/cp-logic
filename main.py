@@ -16,15 +16,17 @@ from tools import *
 class GUI(QtGui.QMainWindow, Ui_MainWindow):
     def __init__(self, parent=None):
         super(GUI, self).__init__(parent)
-
         self.tools = Tools()
-
         self.setupUi(self)
+        self.init()
+        
+    def init(self):
         self.count = 0
+        self.formulas = []
+        self.listWidget.clear()
         self.listWidget.addItem('Welcome to cp-logic! Try entering something like this (double-click on entry):')
         self.listWidget.addItem('p0 AND (NOT p1 OR p2)')
         self.listWidget.addItem('----------------------------------------------------------------------------------')
-        self.formulas = []
 
     def entry_clicked(self, b):
         text = unicode(b.text())
@@ -87,7 +89,7 @@ class GUI(QtGui.QMainWindow, Ui_MainWindow):
         if (self.tools.VERBOSE): print '0. Starting with:', text
         # 1. Check if the statement is an assignment
         assignment_flag = ''
-        text = str(text)
+        text = unicode(text)
         if text.find('=') != -1:                      # assignment
             if len(text.split('=')[0].strip()) == 1:
                 assignment_flag = text.split('=')[0].strip()
@@ -248,7 +250,7 @@ class GUI(QtGui.QMainWindow, Ui_MainWindow):
                 formula_list = formula.split(',')
                 
                 # check for metavariables
-                print 'working with', formula_list
+                #print 'working with', formula_list
                 #print 'All metavariables should be resolved at this stage!'
 
                 is_axiom = self.tools.dchains(formula_list)
@@ -270,17 +272,30 @@ class GUI(QtGui.QMainWindow, Ui_MainWindow):
         entry = ''
         text = self.lineEdit.text()
         self.lineEdit.clear()
+        self.enter_input(text)
+
+    def enter_input(self, text):
         self.listWidget.addItem('>> ' + text)
-
         entry = self.analyze_input(text)
-
+        #print 'entering', entry
         self.listWidget.addItem('[' + str(self.count) + ']   ' + entry)
         self.listWidget.addItem('')
         self.listWidget.scrollToBottom()
         self.count += 1
 
-    def menu_loadformula(self):
-        raise NotImplementedError
+    def menu_import(self):
+        filepath = QtGui.QFileDialog.getOpenFileName(self, u'Open file', u'', u'Files (*.*)')[0]
+        self.listWidget.addItem('>> Loading from file:' + filepath)
+        
+        if len(filepath) > 1:
+            content = open(filepath, 'r').readlines()
+            for line in content:
+                self.enter_input(line.strip())
+        else:
+            self.listWidget.addItem('Empty file path.')
+            
+    def menu_clear(self):
+        self.init()
 
     def menu_nnf(self):
         self.lineEdit.setText('nnf(' + self.lineEdit.text() + ')')

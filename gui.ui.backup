@@ -57,6 +57,12 @@
      <height>25</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menu">
+    <property name="title">
+     <string>?</string>
+    </property>
+    <addaction name="actionInfo"/>
+   </widget>
    <widget class="QMenu" name="menuTools">
     <property name="title">
      <string>Tools</string>
@@ -80,16 +86,9 @@
     <addaction name="separator"/>
     <addaction name="actionLatex"/>
    </widget>
-   <widget class="QMenu" name="menuFile">
-    <property name="title">
-     <string>File</string>
-    </property>
-    <addaction name="actionImport_file"/>
-    <addaction name="actionClear_Session"/>
-   </widget>
-   <addaction name="menuFile"/>
    <addaction name="menuFormula"/>
    <addaction name="menuTools"/>
+   <addaction name="menu"/>
   </widget>
   <action name="actionDchains">
    <property name="text">
@@ -149,16 +148,6 @@
   <action name="actionClause_set">
    <property name="text">
     <string>clause_set()</string>
-   </property>
-  </action>
-  <action name="actionImport_file">
-   <property name="text">
-    <string>Import file...</string>
-   </property>
-  </action>
-  <action name="actionClear_Session">
-   <property name="text">
-    <string>Clear Session</string>
    </property>
   </action>
  </widget>
@@ -388,38 +377,6 @@
     </hint>
    </hints>
   </connection>
-  <connection>
-   <sender>actionImport_file</sender>
-   <signal>activated()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>menu_import()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>334</x>
-     <y>254</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>actionClear_Session</sender>
-   <signal>activated()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>menu_clear()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>334</x>
-     <y>254</y>
-    </hint>
-   </hints>
-  </connection>
  </connections>
  <slots>
   <slot>buttonPressed()</slot>
@@ -437,7 +394,5 @@
   <slot>menu_clause_set()</slot>
   <slot>menu_evaluate()</slot>
   <slot>menu_resolution()</slot>
-  <slot>menu_import()</slot>
-  <slot>menu_clear()</slot>
  </slots>
 </ui>
