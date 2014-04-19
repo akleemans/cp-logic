@@ -53,7 +53,7 @@ class Tree(object):
         # preparing canvas
         pygame.init()
         pygame.display.set_caption("dchains-tree")
-        self.disp = pygame.display.set_mode([self.size[0], self.size[1]], RESIZABLE)
+        self.disp = pygame.display.set_mode([self.size[0], self.size[1]])
         
         self.dispRect = self.disp.get_rect()
         self.world = pygame.Surface((self.image_size[0], self.image_size[1]))
