@@ -3,4 +3,5 @@ B = p2 AND p1 IMPL NOT p3
 C = NOT p0 AND p1 AND NOT p2 AND (p1 OR NOT p2)
 nnf(A)
 cnf(B)
-dchains(A AND NOT (C OR B))
+D = ((p0 IMPL p1) AND (p2 IMPL p1)) IMPL ((p0 OR p2) IMPL p1)
+dchains(D)
