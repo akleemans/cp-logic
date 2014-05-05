@@ -38,14 +38,20 @@ class Tree(object):
         Constructor
         '''
         self.start_node = start_node
-        self.size = (1200, 1000)
+        self.size = (800, 600)
         self.nodes = []
+        
+        self.prepare_canvas()
 
+        while not self.catch_event():
+            self.draw_board()
+            time.sleep(0.1)
+
+    def prepare_canvas(self):
         # calculate depth
         self.depth = self.get_depth()
-        self.image_size = (max((2**self.depth)*50, self.size[0]), 1000)
-        #print self.depth
-
+        self.image_size = (max((2**self.depth)*50, self.size[0]), self.size[1])
+        
         # assign coordinates to nodes
         self.nodes = self.get_nodes()
         self.set_coordinates()
@@ -53,7 +59,7 @@ class Tree(object):
         # preparing canvas
         pygame.init()
         pygame.display.set_caption("dchains-tree")
-        self.disp = pygame.display.set_mode([self.size[0], self.size[1]])
+        self.disp = pygame.display.set_mode([self.size[0], self.size[1]], RESIZABLE)
         
         self.dispRect = self.disp.get_rect()
         self.world = pygame.Surface((self.image_size[0], self.image_size[1]))
@@ -64,10 +70,7 @@ class Tree(object):
         self.knob = pygame.Rect(self.track)
         self.knob.width = self.track.width * self.ratio
         self.scrolling = False
-
-        while not self.catch_event():
-            self.draw_board()
-            time.sleep(0.1)
+        self.set_coordinates()
 
     def resource_path(self, relative):
         if hasattr(sys, "_MEIPASS"):
@@ -197,9 +200,8 @@ class Tree(object):
                 return True
 
             elif event.type == VIDEORESIZE:
-                self.size = event.dict['size']
-                self.disp = pygame.display.set_mode([self.size[0], self.size[1]], RESIZABLE)
-                self.set_coordinates()
+                self.size = event.dict['size']                
+                self.prepare_canvas()
 
             elif (event.type == pygame.MOUSEMOTION and self.scrolling):
                 if event.rel[0] != 0:
