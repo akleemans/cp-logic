@@ -72,7 +72,7 @@ Metavariables can be used to define other formulas or metavariables:
 ### Application of a function
 
 Several forms of a formula can be calculated using the corresponding functions.
-For example, the *negation normal form** form can be obtained with
+For example, the **negation normal form** form can be obtained with
 
     nnf(p0 AND p1 IMPL p2)
 
@@ -164,10 +164,9 @@ where A, B and C are metavariables or formulas, entered directly. The system wil
 By clicking on a node, you can see which sequence the node is representing.
 
 The color of each node represents whether the underlying sequence is an axiom or not:
- * **red**: chain is not an axiom
- * **blue**: chain is the *identity*-axiom of PSC
- * **green**: chain is the *true*-axiom of PSC
- * **black**: undefined
+ * **black**: sequence is reducible
+ * **red**: sequence is irreducible and not an axiom
+ * **green**: sequence is an axiom (*true* or *identity*) of PSC
 
 ### Nesting
 
