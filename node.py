@@ -28,7 +28,7 @@ class Node(object):
         self.parent = parent
         self.edge = edge
         self.children = []
-        self.axiom = 'undef' # undef, no, id, true
+        self.axiom = 'reducible' # undef, no, id, true
         self.status = ''
 
     def set_position(self, x, y):
@@ -49,11 +49,11 @@ class Node(object):
         Traverses tree and its child nodes.
         Returns if it ends in an axiom (True) or if not (False).
         '''
+        
+        self.calculate_children()
 
         if self.is_axiom():
             return True
-
-        self.calculate_children()
 
         if len(self.children) == 0:
             # not an axiom and no children ==> irreducible
@@ -61,7 +61,10 @@ class Node(object):
         elif len(self.children) == 1:
             return self.children[0].traverse_tree()
         elif len(self.children) == 2:
-            return (self.children[0].traverse_tree() and self.children[1].traverse_tree())
+            children_status = []
+            children_status.append(self.children[0].traverse_tree())
+            children_status.append(self.children[1].traverse_tree())
+            return (children_status[0] and children_status[1])
 
     def calculate_children(self):
         '''
@@ -133,6 +136,9 @@ class Node(object):
                     self.axiom = 'id'
                     return True
 
-        # default case: not an axiom
-        self.axiom = 'no'
+        # not an axiom. check other two cases
+        if len(self.children) > 0:
+            self.axiom = 'reducible'
+        else:
+            self.axiom = 'no'
         return False

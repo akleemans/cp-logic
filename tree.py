@@ -159,23 +159,19 @@ class Tree(object):
 
             # draw if it's an axiom or not
             circle_color = BLACK
-            if node.axiom == 'true':
+            if node.axiom == 'true' or node.axiom == 'id':
                 circle_color = GREEN
-            elif node.axiom == 'id':
-                circle_color = BLUE
+            elif node.axiom == 'reducible':
+                circle_color = BLACK
             elif node.axiom == 'no':
                 circle_color = RED
-            elif node.axiom == 'undef':
-                circle_color = BLACK
 
             # draw node shape
             pygame.draw.rect(self.world, circle_color, (node.x-x_offset-5, node.y-y_offset-2, x_offset*2+10, y_offset*2+4), 2)
-            #pygame.draw.circle(self.disp, circle_color, (node.x+5, node.y+7), 20, 2)
 
             # draw if node is currently active
             if node.status == 'marked':
                 label = normal_font.render(node.chain, 1, BLACK)
-                #print 'Size of label:', label.get_width()
                 self.world.blit(label, (node.x-label.get_width()/2+5, node.y-40))
 
         self.disp.blit(self.world, ((self.knob.left / self.ratio) * -1, 0))
@@ -191,7 +187,6 @@ class Tree(object):
         '''
         for event in pygame.event.get():
             if event.type == pygame.MOUSEBUTTONUP:
-                # TODO calculate scrolling-offset
                 pos = pygame.mouse.get_pos()
                 self.handle_click((pos[0] + (self.knob.left / self.ratio), pos[1]))
                 
