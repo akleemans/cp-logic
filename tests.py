@@ -169,6 +169,13 @@ class Tests(unittest.TestCase):
         try: f = Formula(string)
         except FormulaInvalidError: pass
         else: self.fail("Number without a proposition is not valid.")
+        
+    # double negation
+    
+    def test_double_negations(self):
+        string = u'NOT NOT p0 AND NOT p1 AND NOT p3'
+        formula = Formula(string)
+        self.failUnless(self.tools.equal(formula.formula_pedantic, u'( ¬ ¬ p₀ ∧ ¬ p₁ ) ∧ ¬ p₃'))
 
     # some valid formulas
 

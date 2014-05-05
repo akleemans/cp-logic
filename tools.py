@@ -299,7 +299,9 @@ class Tools(object):
 
             if local_level == 0 and formula[pos][0] in ['p', '(', ')']:
                 if direction == 'left' and formula[pos-1] == self.NOT:
-                    return pos-1
+                    i = 1
+                    while formula[pos-i] == self.NOT: i += 1
+                    return pos-i+1
                 else:
                     return pos
 

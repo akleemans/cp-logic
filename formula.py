@@ -37,7 +37,7 @@ class Formula(object):
 
     def check(self, formula):
         ''' Checks if a formula is valid. '''
-
+        
         substitutes = {u'0': u'\u2080', u'1': u'\u2081', u'2': u'\u2082', u'3': u'\u2083', u'4': u'\u2084',
                        u'5': u'\u2085', u'6': u'\u2086', u'7': u'\u2087', u'8': u'\u2088', u'9': u'\u2089',
                        u'AND': self.tools.AND, u'OR': self.tools.OR, u'NOT': self.tools.NOT, u'IMPL': self.tools.IMPL,
@@ -271,8 +271,7 @@ class Formula(object):
                         if bracket.endswith('10'): found_removable = False
                     if found_removable:
                         formula = formula[1:len(formula)-1]
-                        
-        #print 'checkpoint 3', ' '.join(formula)
+
         return ' '.join(formula)
 
     def clause_set(self):
@@ -352,6 +351,7 @@ class Formula(object):
         # 2. calculate v(A), the formula with negation only before atomic propositions
         max_length = len(formula)
         i = 0
+        #while ''.join(formula).find(self.tools.NOT + self.tools.NOT) != -1: # double negation exists
         while i < max_length:
             if formula[i] == self.tools.NOT:
                 if formula[i+1] == self.tools.NOT: # double negation found
@@ -373,8 +373,13 @@ class Formula(object):
                             elif formula[index] == self.tools.AND: formula[index] = self.tools.OR
                             formula.insert(index+1, self.tools.NOT)
                             break
+                            
+                    # reset i and recalculate length
+                    i = 0
+                    max_length = len(formula)
+                
             i += 1
-
+        
         return ' '.join(formula)
 
     def to_cnf(self):
