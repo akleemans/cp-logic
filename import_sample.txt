@@ -1,5 +1,5 @@
-A = p0 OR NOT (p1 AND NOT p2)
-B = p2 AND p1 IMPL NOT p3
+A = (p0 OR p1) AND (p2 AND NOT (p3 OR p4 OR NOT p5))
+B =  NOT p3 AND p4 AND p5 AND (NOT p2 OR p3 OR p1) AND NOT (NOT p1 OR p0)
 C = NOT p0 AND p1 AND NOT p2 AND (p1 OR NOT p2)
 nnf(A)
 cnf(B)

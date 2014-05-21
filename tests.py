@@ -422,6 +422,16 @@ class Tests(unittest.TestCase):
         formula = Formula(string)
         self.failUnless(formula.formula_nnf == u'( p₀ ∧ p₁ )')
 
+    def test_nnf13(self):
+        string = '(p0 OR NOT p0) AND NOT (NOT p1 AND BOTTOM) AND (NOT p1 AND (p0 OR NOT p1))'
+        formula = Formula(string)
+        self.failUnless(formula.formula_nnf == u'( ( p₀ ∨ ¬ p₀ ) ∧ ( p₁ ∨ ⊤ ) ) ∧ ( ¬ p₁ ∧ ( p₀ ∨ ¬ p₁ ) )')
+        
+    def test_nnf14(self):
+        string = 'NOT BOTTOM'
+        formula = Formula(string)
+        self.failUnless(formula.formula_nnf == u'⊤')
+        
     ### sufo()
 
     def test_sufo1(self):
@@ -479,7 +489,7 @@ class Tests(unittest.TestCase):
     def test_cnf5(self):
         string = 'NOT TOP'
         formula = Formula(string)
-        self.failUnless(self.tools.equal(formula.formula_cnf, u'¬ (p₀ ∨ ¬ p₀)'))
+        self.failUnless(self.tools.equal(formula.formula_cnf, u'( p₀ ∧ ¬ p₀ )'))
 
     def test_cnf6(self):
         string = 'p0 OR (p1 AND p2)'

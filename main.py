@@ -44,7 +44,9 @@ class GUI(QtGui.QMainWindow, Ui_MainWindow):
 
     def build_formula(self, formula, name):
         ''' Returns formula, if existing, else builds a new one '''
-        if len(formula) == 1:
+        print 'build_formula: formula = ', formula
+        alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+        if len(formula) == 1 and formula in alphabet:
             for f in self.formulas:
                 if f.name == formula:
                     return f
@@ -261,7 +263,7 @@ class GUI(QtGui.QMainWindow, Ui_MainWindow):
 
                 return summary
 
-        else:                                           # plain formula
+        else: # plain formula
             f = self.build_formula(text, anon)
             if isinstance(f, basestring):
                 return f

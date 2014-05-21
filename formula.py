@@ -359,6 +359,17 @@ class Formula(object):
                     formula.pop(i)
                     i -= 1
                     max_length -= 2
+                    
+                elif formula[i+1] in [self.tools.TOP, self.tools.BOTTOM]:
+                    formula.pop(i)
+                    if formula[i] == self.tools.TOP:
+                        formula.pop(i)
+                        formula.insert(i, self.tools.BOTTOM)
+                    elif formula[i] == self.tools.BOTTOM:
+                        formula.pop(i)
+                        formula.insert(i, self.tools.TOP)
+                    max_length -= 1
+                    
                 elif formula[i+1] == '(': # 'bad' negation found
                     formula.pop(i)
                     formula.insert(i+1, self.tools.NOT)
