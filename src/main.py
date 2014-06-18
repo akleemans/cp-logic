@@ -45,7 +45,6 @@ class GUI(QtGui.QMainWindow, Ui_MainWindow):
     def build_formula(self, formula, name):
         ''' Returns formula, if existing, else builds a new one '''
         formula = formula.strip()
-        print 'build_formula: formula = ', formula
         
         alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
         if len(formula) == 1 and formula in alphabet:
