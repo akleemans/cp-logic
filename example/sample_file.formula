@@ -1,0 +1,4 @@
+C = (p0 OR p1) AND (p2 AND NOT (p3 OR p4 OR NOT p5))
+D = NOT p3 AND p4 AND p5 AND (NOT p2 OR p3 OR p1) AND NOT (NOT p1 OR p0)
+E = NOT p0 AND p1 AND NOT p2 AND (p1 OR NOT p2)
+F = ((p0 IMPL p1) AND (p2 IMPL p1)) IMPL ((p0 OR p2) IMPL p1)

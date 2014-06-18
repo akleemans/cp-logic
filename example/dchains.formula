@@ -1,0 +1,1 @@
+dchains((p0 OR NOT p0) AND NOT (NOT p1 AND BOTTOM) AND (NOT p1 AND (p0 OR NOT p1)))
