@@ -330,23 +330,23 @@ class Formula(object):
 
         # 1. calculate p(A), the formula without implication
         formula = self.tools.to_list(self.formula_pedantic)
-        for i in range(len(formula)):
-            if formula[i] == self.tools.IMPL: # implication found
-                formula[i] = self.tools.OR
-                if formula[i-1][0] in ['p', self.tools.TOP, self.tools.BOTTOM]:
-                    formula.insert(i-1, self.tools.NOT)
-                elif formula[i-1] == ')':
-                    level = -1
-                    for index in range(i-2, -1, -1):
-                        if formula[index] == ')': level -= 1
-                        elif formula[index] == '(': level += 1
-
-                        if level == 0:
-                            formula.insert(index, self.tools.NOT)
-                            break
-
-                else:
-                    raise FormulaInvalidError('invalid implication (no implicant found)')
+        
+        while self.tools.IMPL in formula:
+            for i in range(len(formula)):
+                if formula[i] == self.tools.IMPL: # implication found
+                    formula[i] = self.tools.OR
+                    if formula[i-1][0] in ['p', self.tools.TOP, self.tools.BOTTOM]:
+                        formula.insert(i-1, self.tools.NOT)
+                    elif formula[i-1] == ')':
+                        level = -1
+                        for index in range(i-2, -1, -1):
+                            if formula[index] == ')': level -= 1
+                            elif formula[index] == '(': level += 1
+                            if level == 0:
+                                formula.insert(index, self.tools.NOT)
+                                break
+                    else:
+                        raise FormulaInvalidError('invalid implication (no implicant found)')
 
         # 2. calculate v(A), the formula with negation only before atomic propositions
         max_length = len(formula)
