@@ -78,7 +78,7 @@ class Formula(object):
             if parts[i] == 'p':
                 raise FormulaInvalidError('propositions need an index')
             if i < len(parts)-1 and parts[i].startswith('p') and parts[i+1].startswith('p'):
-                raise FormulaInvalidError('propositions need to be connected with a conjunction')
+                raise FormulaInvalidError('propositions need to be connected with a connective')
 
         # checking lonely numbers
         for i in range(len(formula)):
@@ -102,11 +102,11 @@ class Formula(object):
             if part in self.tools.conjunctions:
                 if i < len(parts) - 1:
                     if parts[i+1] in self.tools.conjunctions or parts[i+1] == ')':
-                        raise FormulaInvalidError('illegal conjunction')
+                        raise FormulaInvalidError('illegal connective')
                 if i == 0:
-                        raise FormulaInvalidError('illegal conjunction')
+                        raise FormulaInvalidError('illegal connective')
                 if i == len(parts) - 1:
-                        raise FormulaInvalidError('illegal conjunction')
+                        raise FormulaInvalidError('illegal connective')
 
         # removing spaces
         formula = ''.join(f)
