@@ -148,11 +148,13 @@ class Tools(object):
         Will be called from the main class.
         '''
         formula = self.to_list(formula_nnf)
-
+        
          # replace TOP and BOTTOM with t and f
         for i in range(len(formula)):
             if formula[i] == self.TOP: formula[i] = 't'
-            if formula[i] == self.BOTTOM: formula[i] = 'f'
+            elif formula[i] == self.BOTTOM: formula[i] = 'f'
+            elif formula[i].startswith('p'): 
+                return 'No propositions allowed.'
 
         return self.resolve(formula)
 
