@@ -7,7 +7,9 @@
 #
 # WARNING! All changes made in this file will be lost!
 
-from PyQt4 import QtCore, QtGui
+#for building in windows: from PyQt4 import QtCore, QtGui
+
+from PySide import QtCore, QtGui
 import locale
 
 locale.setlocale(locale.LC_ALL, '')

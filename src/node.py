@@ -50,11 +50,11 @@ class Node(object):
         Returns if it ends in an axiom (True) or if not (False).
         '''
         
-        self.calculate_children()
-
         if self.is_axiom():
             return True
-
+        
+        self.calculate_children()
+        
         if len(self.children) == 0:
             # not an axiom and no children ==> irreducible
             return False
